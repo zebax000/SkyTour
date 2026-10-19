@@ -11,6 +11,16 @@ Usamos GitHub Flow: una rama principal siempre funcional y ramas cortas para cad
 5. Pide la revisión de al menos un compañero.
 6. Une con Squash and merge y borra la rama.
 
+## Antes de abrir un Pull Request
+
+No hay revisiones automáticas, así que cada persona comprueba esto a mano:
+
+- Mi rama está actualizada con main.
+- Las pruebas pasan (`pytest` en el backend y las pruebas de Vitest en el frontend).
+- El código está formateado (`ruff` en Python y Prettier en el frontend).
+- No subí `.env` ni claves.
+- El Pull Request menciona la historia de Jira que resuelve, por ejemplo HU-07.
+
 ## Nombres de ramas
 
 - `feat/` para funcionalidades nuevas, por ejemplo `feat/login`
@@ -28,7 +38,6 @@ Escribe en español, en presente y de forma breve, con el prefijo del tipo. Ejem
 - Trabaja dentro de la carpeta de tu bloque siempre que puedas.
 - Si vas a tocar un archivo de otro bloque, avísale a su responsable.
 - Los documentos y el logo van en `docs/`.
-- Antes de abrir un Pull Request, actualiza tu rama con main y prueba que todo funcione.
 
 ## Bloques de trabajo (propuesta por confirmar)
 
@@ -36,8 +45,8 @@ Escribe en español, en presente y de forma breve, con el prefijo del tipo. Ejem
 - Backend: Thomas y Andrés
 - Frontend: Allison y Nicolas
 - IA de riesgo: Sebastian y Nicolas
-- Pruebas: todos prueban su bloque y una persona coordina
+- Pruebas: Sebastian coordina y cada persona prueba lo que escribe
 
 ## Tareas
 
-El trabajo se reparte en Jira. Cada rama y cada Pull Request debe mencionar el código de su historia, por ejemplo HU-07.
+El trabajo se reparte en Jira, una tarea por historia de usuario.

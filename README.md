@@ -2,6 +2,8 @@
 
 Aplicación web para registrar, clasificar, evaluar y hacer seguimiento a proveedores turísticos (hoteles, aerolíneas, transportadores, guías y más). Incluye control de documentos y vigencias, evaluaciones, incidentes, comparador y un puntaje de riesgo con IA que explica sus factores.
 
+Estado: en construcción.
+
 ## Qué hace
 
 - Registro y clasificación de proveedores por tipo
@@ -24,17 +26,18 @@ El trabajo se organiza en sprints. El Sprint 1 es el primer incremento y el MVP 
 | Backend | Python 3, FastAPI, SQLAlchemy y Pydantic |
 | Base de datos | PostgreSQL (Neon) |
 | Pruebas | pytest y Vitest |
+| Despliegue | Vercel (frontend) y Render (backend) |
 | Gestión | Git, GitHub, Jira y Figma |
 
 ## Estructura del repositorio
 
 ```
-backend/   API y motor de riesgo (Python)
+backend/   API, base de datos (modelos, migraciones y datos iniciales) y motor de riesgo
 frontend/  Interfaz (React)
-db/        Migraciones y datos de demostración
-docs/      Especificación, tablas, USM y branding
-.github/   Plantillas de Pull Request e Issues
+docs/      Especificación, tablas, USM, diagrama, logo y guías por área
 ```
+
+Las carpetas backend/ y frontend/ se crean cuando se escribe el primer archivo de código.
 
 ## Cómo empezar
 
