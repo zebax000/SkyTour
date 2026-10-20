@@ -24,7 +24,7 @@ const ETIQUETA_MOTIVO: Record<string, string> = {
   limite_de_frecuencia: "Se alcanzó el límite de una solicitud cada 15 segundos. Espera un momento e inténtalo de nuevo.",
   clave_invalida_o_solicitud_rechazada: "Gemini rechazó la clave o la solicitud (error 400). Revisa que la clave sea válida.",
   clave_o_permiso_rechazado: "Gemini rechazó la clave o sus permisos (error 401 o 403).",
-  modelo_no_disponible: "El modelo no está disponible para esta cuenta (error 404). Define otro en GEMINI_MODEL.",
+  modelo_no_disponible: "Gemini respondió 404: no encontró el modelo o la operación. El mensaje exacto de Google está en los registros del servidor.",
   cuota_agotada: "Se agotó la cuota de Gemini (error 429). Espera o revisa el plan de la cuenta.",
   servicio_saturado: "El servicio de Gemini falló o está saturado (error 5xx). Inténtalo más tarde.",
   tiempo_agotado: "Gemini tardó más de 10 segundos en responder.",
@@ -78,9 +78,10 @@ export function RiesgoProveedor({ proveedorId, puedeRegistrar }: { proveedorId: 
     setOcupado("explicar");
     setError(null);
     try {
-      const { resumen, acciones, origen, modelo, motivo, aviso, ...calculo } = await riesgoApi.explicar(proveedorId);
+      const { resumen, acciones, origen, modelo, modelo_solicitado, motivo, aviso, ...calculo } =
+        await riesgoApi.explicar(proveedorId);
       setResultado(calculo);
-      setExplicacion({ resumen, acciones, origen, modelo, motivo, aviso });
+      setExplicacion({ resumen, acciones, origen, modelo, modelo_solicitado, motivo, aviso });
     } catch (e) {
       setError(mensajeDe(e, "No se pudo generar la explicación."));
     } finally {
@@ -157,6 +158,7 @@ export function RiesgoProveedor({ proveedorId, puedeRegistrar }: { proveedorId: 
           {explicacion.origen === "reglas" && explicacion.motivo && (
             <p className="meta">
               Motivo: {ETIQUETA_MOTIVO[explicacion.motivo] ?? explicacion.motivo}
+              {explicacion.modelo_solicitado && ` Modelo solicitado por el servidor: ${explicacion.modelo_solicitado}.`}
             </p>
           )}
         </div>

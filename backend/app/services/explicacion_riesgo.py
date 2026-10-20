@@ -62,8 +62,8 @@ def respaldo(resultado):
     return {'resumen': f"Riesgo {resultado['nivel']}: {resultado['puntaje']}/100. {detalle}", 'acciones': acciones, 'origen': 'reglas'}
 
 
-def _con_motivo(base, motivo):
-    return {**base, 'motivo': motivo}
+def _con_motivo(base, motivo, modelo):
+    return {**base, 'motivo': motivo, 'modelo_solicitado': modelo}
 
 
 def _clasificar_error(error):
@@ -80,46 +80,54 @@ def _clasificar_error(error):
     return 'error_desconocido', None
 
 
+def _detalle_seguro(error, secreto):
+    # Mensaje de Google acortado, en una sola línea y con la clave tapada si apareciera.
+    texto = ' '.join(str(getattr(error, 'message', None) or error).split())[:300]
+    return texto.replace(secreto, '***') if secreto else texto
+
+
 def explicar(resultado):
     global _ultima_llamada
     base = respaldo(resultado)
     config = ConfigIA()
+    modelo = config.gemini_model
     if resultado['nivel'] == 'sin_datos':
-        return _con_motivo(base, 'sin_datos')
+        return _con_motivo(base, 'sin_datos', modelo)
     if not config.gemini_api_key or not config.gemini_api_key.get_secret_value().strip():
-        return _con_motivo(base, 'sin_clave')
+        return _con_motivo(base, 'sin_clave', modelo)
     # Solo salen datos numéricos agregados: nunca nombres, documentos, comentarios ni contactos.
     datos = {k: resultado[k] for k in ('puntaje', 'nivel', 'factores')}
-    clave = config.gemini_model + json.dumps(datos, sort_keys=True)
+    clave = modelo + json.dumps(datos, sort_keys=True)
     ahora = monotonic()
     with _lock:
         if clave in _cache and ahora - _cache[clave][0] < 3600:
             return _cache[clave][1]
         # Límite conservador global por proceso; sin espera ni bloqueo del resto de la aplicación.
         if ahora - _ultima_llamada < 15:
-            return _con_motivo(base, 'limite_de_frecuencia')
+            return _con_motivo(base, 'limite_de_frecuencia', modelo)
         _ultima_llamada = ahora
     try:
         from google import genai
         from google.genai import types
         with genai.Client(api_key=config.gemini_api_key.get_secret_value(), http_options=types.HttpOptions(timeout=10000)) as client:
             respuesta = client.models.generate_content(
-                model=config.gemini_model,
+                model=modelo,
                 contents='Explica en español estos resultados ya calculados. No cambies ni recalcules el puntaje. No inventes hechos. Sugiere hasta cinco acciones prudentes para revisión humana; no ordenes suspender proveedores. Datos: ' + json.dumps(datos),
                 config={'response_mime_type': 'application/json', 'response_json_schema': Explicacion.model_json_schema(), 'temperature': 0.2},
             )
         contenido = respuesta.text or ''
     except Exception as error:
-        # Solo se registra la categoría, el tipo de excepción y el código HTTP; nunca el mensaje, la clave ni los datos.
+        # Se registra categoría, tipo, código, modelo y el mensaje de Google acortado y con la clave tapada. Nunca los datos enviados.
         motivo, codigo = _clasificar_error(error)
-        logger.warning('Gemini no disponible (motivo=%s, tipo=%s, codigo=%s); se usa explicación por reglas.', motivo, type(error).__name__, codigo)
-        return _con_motivo(base, motivo)
+        detalle = _detalle_seguro(error, config.gemini_api_key.get_secret_value())
+        logger.warning('Gemini no disponible (motivo=%s, tipo=%s, codigo=%s, modelo=%s, detalle=%s); se usa explicación por reglas.', motivo, type(error).__name__, codigo, modelo, detalle)
+        return _con_motivo(base, motivo, modelo)
     try:
         texto = Explicacion.model_validate_json(contenido)
     except ValueError:
-        logger.warning('Gemini no disponible (motivo=respuesta_invalida); se usa explicación por reglas.')
-        return _con_motivo(base, 'respuesta_invalida')
-    salida = {**texto.model_dump(), 'origen': 'gemini', 'modelo': config.gemini_model}
+        logger.warning('Gemini no disponible (motivo=respuesta_invalida, modelo=%s); se usa explicación por reglas.', modelo)
+        return _con_motivo(base, 'respuesta_invalida', modelo)
+    salida = {**texto.model_dump(), 'origen': 'gemini', 'modelo': modelo}
     with _lock:
         _cache[clave] = (monotonic(), salida)
         _cache.move_to_end(clave)

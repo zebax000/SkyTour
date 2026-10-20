@@ -17,6 +17,7 @@ export interface Explicacion {
   acciones: string[];
   origen: "gemini" | "reglas";
   modelo?: string;
+  modelo_solicitado?: string;
   motivo?: string;
   aviso?: string;
 }

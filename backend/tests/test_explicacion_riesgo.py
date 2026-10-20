@@ -138,13 +138,30 @@ def test_error_desconocido(monkeypatch):
     assert m.explicar(RESULTADO)["motivo"] == "error_desconocido"
 
 
-def test_registro_no_incluye_mensaje_ni_clave(monkeypatch, caplog):
-    cliente_falso(monkeypatch, falla=ErrorApi(429))
+def test_respuesta_incluye_el_modelo_solicitado(monkeypatch):
+    monkeypatch.setenv("GEMINI_MODEL", "modelo-de-prueba")
+    cliente_falso(monkeypatch, falla=ErrorApi(404))
+    r = m.explicar(RESULTADO)
+    assert r["motivo"] == "modelo_no_disponible" and r["modelo_solicitado"] == "modelo-de-prueba"
+
+
+def test_registro_muestra_detalle_pero_oculta_la_clave(monkeypatch, caplog):
+    monkeypatch.setenv("GEMINI_MODEL", "modelo-de-prueba")
+    cliente_falso(monkeypatch, falla=ErrorApi(404))
     with caplog.at_level(logging.WARNING):
         m.explicar(RESULTADO)
     texto = caplog.text
-    assert "cuota_agotada" in texto and "ErrorApi" in texto and "429" in texto
+    assert "modelo_no_disponible" in texto and "ErrorApi" in texto and "404" in texto
+    assert "modelo=modelo-de-prueba" in texto and "mensaje con *** que no debe registrarse" in texto
     assert "clave-falsa" not in texto
+    assert "Nombre que nunca debe salir" not in texto
+
+
+def test_detalle_seguro_acorta_y_tapa_la_clave():
+    largo = m._detalle_seguro(RuntimeError("x" * 500), "secreto")
+    assert len(largo) == 300
+    assert m._detalle_seguro(RuntimeError("uso secreto aqui"), "secreto") == "uso *** aqui"
+    assert "\n" not in m._detalle_seguro(RuntimeError("a\nb"), "secreto")
 
 
 @pytest.mark.parametrize("texto", ["no es json", "", None, json.dumps({"resumen": "x", "acciones": ["a"] * 6})])
