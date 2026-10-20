@@ -18,8 +18,17 @@ import {
   type EstadoProveedor,
   type ProveedorDetalle,
 } from "../proveedores/tipos";
+import { RiesgoProveedor } from "../riesgo/RiesgoProveedor";
 
-type Pestana = "datos" | "servicios" | "cobertura" | "documentos" | "evaluaciones" | "incidentes" | "observaciones";
+type Pestana =
+  | "datos"
+  | "servicios"
+  | "cobertura"
+  | "documentos"
+  | "evaluaciones"
+  | "incidentes"
+  | "observaciones"
+  | "riesgo";
 
 const PESTANAS: { id: Pestana; etiqueta: string }[] = [
   { id: "datos", etiqueta: "Datos" },
@@ -29,6 +38,7 @@ const PESTANAS: { id: Pestana; etiqueta: string }[] = [
   { id: "evaluaciones", etiqueta: "Evaluaciones" },
   { id: "incidentes", etiqueta: "Incidentes" },
   { id: "observaciones", etiqueta: "Observaciones" },
+  { id: "riesgo", etiqueta: "Riesgo IA" },
 ];
 
 function mensajeDe(e: unknown, porDefecto: string): string {
@@ -194,6 +204,7 @@ export function ProveedorFichaPage() {
         {pestana === "observaciones" && (
           <ObservacionesProveedor proveedorId={proveedor.id} puedeRegistrar={puedeRegistrar} />
         )}
+        {pestana === "riesgo" && <RiesgoProveedor proveedorId={proveedor.id} puedeRegistrar={puedeRegistrar} />}
       </div>
     </section>
   );
