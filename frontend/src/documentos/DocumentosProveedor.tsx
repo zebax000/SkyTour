@@ -276,43 +276,57 @@ export function DocumentosProveedor({ proveedorId, puedeEditar }: Props) {
 
       {documentos !== null && documentos.length > 0 && (
         <div className="tabla-contenedor">
-          <table className="tabla">
+          <table className="tabla tabla-documentos">
             <caption className="sr-only">Documentos del proveedor</caption>
             <thead>
               <tr>
                 <th scope="col">Documento</th>
-                <th scope="col">Emisión</th>
-                <th scope="col">Vencimiento</th>
-                <th scope="col">Estado</th>
+                <th scope="col" className="col-fecha">
+                  Emisión
+                </th>
+                <th scope="col" className="col-fecha">
+                  Vencimiento
+                </th>
+                <th scope="col" className="col-estado">
+                  Estado
+                </th>
                 <th scope="col">Archivo</th>
-                {puedeEditar && <th scope="col">Acciones</th>}
+                {puedeEditar && (
+                  <th scope="col" className="col-acciones">
+                    Acciones
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody>
               {documentos.map((d) => (
                 <tr key={d.id}>
                   <td>{d.tipo}</td>
-                  <td>{formatearFecha(d.fecha_emision)}</td>
-                  <td>{formatearFecha(d.fecha_vencimiento)}</td>
-                  <td>
+                  <td className="col-fecha">{formatearFecha(d.fecha_emision)}</td>
+                  <td className="col-fecha">{formatearFecha(d.fecha_vencimiento)}</td>
+                  <td className="col-estado">
                     <InsigniaDocumento estado={d.estado} />
                     <span className="detalle-vencimiento">{describirVencimiento(d.dias_restantes)}</span>
                   </td>
                   <td>
                     {d.archivo ? (
-                      <>
-                        <span className="archivo-nombre">{d.archivo.nombre}</span>
-                        <span className="archivo-tamano">{formatearTamano(d.archivo.tamano)} </span>
-                        <button type="button" className="boton secundario pequeno" onClick={() => descargar(d)}>
-                          Descargar
-                        </button>
-                      </>
+                      <div className="celda-archivo">
+                        <span className="archivo-nombre" title={d.archivo.nombre}>
+                          {d.archivo.nombre}
+                        </span>
+                        <div className="archivo-meta">
+                          <span className="archivo-tamano">{formatearTamano(d.archivo.tamano)}</span>
+                          <button type="button" className="boton secundario pequeno" onClick={() => descargar(d)}>
+                            Descargar
+                          </button>
+                        </div>
+                      </div>
                     ) : (
-                      "Sin archivo"
+                      <span className="sin-archivo">Sin archivo</span>
                     )}
                   </td>
                   {puedeEditar && (
-                    <td>
+                    <td className="col-acciones">
                       <div className="acciones-fila">
                         <button type="button" className="boton secundario pequeno" onClick={() => abrirEdicion(d)}>
                           Editar
