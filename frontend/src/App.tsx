@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { RequireAuth } from "./components/RequireAuth";
 import { RequireRole } from "./components/RequireRole";
+import { DocumentosPage } from "./pages/DocumentosPage";
 import { InicioPage } from "./pages/InicioPage";
 import { LoginPage } from "./pages/LoginPage";
 import { NoEncontradaPage } from "./pages/NoEncontradaPage";
@@ -29,11 +30,9 @@ export default function App() {
           </Route>
           <Route path="proveedores/:id" element={<ProveedorFichaPage />} />
 
+          <Route path="documentos" element={<DocumentosPage />} />
+
           {/* TODO(frontend): cada página pendiente se reemplaza en la fase indicada */}
-          <Route
-            path="documentos"
-            element={<PaginaPendiente titulo="Documentos y vigencias" fase="Fase 5" descripcion="Documentos con semáforo: vigente, por vencer o vencido." />}
-          />
           <Route
             path="evaluaciones"
             element={<PaginaPendiente titulo="Evaluaciones" fase="Fase 6" descripcion="Calificación de 1 a 5 en calidad, puntualidad, cumplimiento y precio." />}

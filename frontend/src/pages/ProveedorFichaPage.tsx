@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 
 import { proveedoresApi } from "../api/proveedores";
 import { useAuth } from "../auth/useAuth";
+import { DocumentosProveedor } from "../documentos/DocumentosProveedor";
 import { GestionServicios } from "../proveedores/GestionServicios";
 import { GestionZonas } from "../proveedores/GestionZonas";
 import { InsigniaEstado } from "../proveedores/Insignias";
@@ -15,12 +16,13 @@ import {
   type ProveedorDetalle,
 } from "../proveedores/tipos";
 
-type Pestana = "datos" | "servicios" | "cobertura";
+type Pestana = "datos" | "servicios" | "cobertura" | "documentos";
 
 const PESTANAS: { id: Pestana; etiqueta: string }[] = [
   { id: "datos", etiqueta: "Datos" },
   { id: "servicios", etiqueta: "Servicios y tarifas" },
   { id: "cobertura", etiqueta: "Cobertura" },
+  { id: "documentos", etiqueta: "Documentos" },
 ];
 
 function mensajeDe(e: unknown, porDefecto: string): string {
@@ -172,6 +174,9 @@ export function ProveedorFichaPage() {
         )}
         {pestana === "cobertura" && (
           <GestionZonas proveedor={proveedor} puedeEditar={esAdministrador} alCambiar={recargar} />
+        )}
+        {pestana === "documentos" && (
+          <DocumentosProveedor proveedorId={proveedor.id} puedeEditar={esAdministrador} />
         )}
       </div>
     </section>

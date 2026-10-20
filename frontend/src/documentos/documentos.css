@@ -1,0 +1,81 @@
+/* Documentos y vigencias: semáforo, tarjetas de resumen y avisos */
+.doc-vigente {
+  color: #1d6b3d;
+  background: #e1f4e8;
+}
+
+.doc-por_vencer {
+  color: #7a5200;
+  background: #fdf0cc;
+}
+
+.doc-vencido {
+  color: #8a2525;
+  background: #fbe4e4;
+}
+
+.detalle-vencimiento {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.8rem;
+  color: #52606d;
+}
+
+.archivo-nombre {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.archivo-tamano {
+  font-size: 0.8rem;
+  color: #52606d;
+}
+
+.aviso {
+  margin: 12px 0;
+  padding: 10px 12px;
+  color: #5c3d00;
+  background: #fdf0cc;
+  border-left: 4px solid var(--ambar);
+  border-radius: 4px;
+}
+
+.aviso.peligro {
+  color: #7a1f1f;
+  background: #fbeaea;
+  border-left-color: var(--rojo);
+}
+
+.tarjetas-resumen {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin: 12px 0 16px;
+}
+
+.tarjeta-resumen {
+  padding: 14px 16px;
+  text-align: left;
+  cursor: pointer;
+  background: #fff;
+  border: 2px solid var(--borde);
+  border-radius: 12px;
+}
+
+.tarjeta-resumen[aria-pressed="true"] {
+  border-color: var(--dorado);
+}
+
+.tarjeta-resumen .cifra {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--azul);
+}
+
+.acciones-fila {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
