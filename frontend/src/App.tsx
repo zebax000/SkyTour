@@ -7,6 +7,8 @@ import { InicioPage } from "./pages/InicioPage";
 import { LoginPage } from "./pages/LoginPage";
 import { NoEncontradaPage } from "./pages/NoEncontradaPage";
 import { PaginaPendiente } from "./pages/PaginaPendiente";
+import { ProveedorFichaPage } from "./pages/ProveedorFichaPage";
+import { ProveedoresPage } from "./pages/ProveedoresPage";
 import { SinPermisoPage } from "./pages/SinPermisoPage";
 
 export default function App() {
@@ -18,11 +20,11 @@ export default function App() {
         <Route element={<Layout />}>
           <Route index element={<InicioPage />} />
 
+          <Route path="proveedores" element={<ProveedoresPage />} />
+          {/* TODO(frontend): "proveedores/nuevo" (alta por pasos) y edición, en la siguiente entrega de la fase 4 */}
+          <Route path="proveedores/:id" element={<ProveedorFichaPage />} />
+
           {/* TODO(frontend): cada página pendiente se reemplaza en la fase indicada */}
-          <Route
-            path="proveedores"
-            element={<PaginaPendiente titulo="Proveedores" fase="Fase 4" descripcion="Lista con búsqueda y filtros, ficha con pestañas y alta por pasos." />}
-          />
           <Route
             path="documentos"
             element={<PaginaPendiente titulo="Documentos y vigencias" fase="Fase 5" descripcion="Documentos con semáforo: vigente, por vencer o vencido." />}

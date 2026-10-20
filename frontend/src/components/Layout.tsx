@@ -20,9 +20,7 @@ export function Layout() {
   return (
     <div className="app">
       <aside className="menu-lateral">
-        <div className="marca">
-          Sky<span>Tour</span>
-        </div>
+        <img className="logo-menu" src="/logo-claro.png" alt="SkyTour: gestión de proveedores turísticos" />
         <nav aria-label="Principal">
           <ul>
             {items.map((item) => (

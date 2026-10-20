@@ -17,6 +17,11 @@ export function setUnauthorizedHandler(manejador: (() => void) | null): void {
   alNoAutorizado = manejador;
 }
 
+interface DetalleValidacion {
+  loc?: unknown[];
+  msg?: string;
+}
+
 export async function apiFetch<T>(ruta: string, init: RequestInit = {}): Promise<T> {
   const cabeceras = new Headers(init.headers);
   cabeceras.set("Accept", "application/json");
@@ -38,13 +43,23 @@ export async function apiFetch<T>(ruta: string, init: RequestInit = {}): Promise
     let mensaje = "Ocurrió un error inesperado.";
     try {
       const cuerpo = await respuesta.json();
-      if (typeof cuerpo?.detail === "string") mensaje = cuerpo.detail;
+      if (typeof cuerpo?.detail === "string") {
+        mensaje = cuerpo.detail;
+      } else if (Array.isArray(cuerpo?.detail)) {
+        // Errores de validación (422): un mensaje por campo
+        mensaje = (cuerpo.detail as DetalleValidacion[])
+          .map((d) => `${String(d.loc?.[d.loc.length - 1] ?? "dato")}: ${d.msg ?? "no es válido"}`)
+          .join(" · ");
+      }
     } catch {
       // la respuesta no traía cuerpo JSON
     }
     if (respuesta.status === 401 && token && alNoAutorizado) alNoAutorizado();
     throw new ApiError(respuesta.status, mensaje);
   }
+
+  // 204 No Content (por ejemplo al quitar una zona): no hay cuerpo que leer
+  if (respuesta.status === 204) return undefined as T;
 
   return (await respuesta.json()) as T;
 }

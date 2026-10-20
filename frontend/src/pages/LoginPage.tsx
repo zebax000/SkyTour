@@ -32,9 +32,7 @@ export function LoginPage() {
   return (
     <main className="login">
       <form className="tarjeta-login" onSubmit={enviar}>
-        <div className="marca marca-login">
-          Sky<span>Tour</span>
-        </div>
+        <img className="logo-login" src="/logo.png" alt="SkyTour" />
         <h1>Iniciar sesión</h1>
         <p className="ayuda">Gestión y evaluación de proveedores turísticos.</p>
 
