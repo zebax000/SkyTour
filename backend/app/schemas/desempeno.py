@@ -4,7 +4,7 @@ from typing import Annotated, Optional
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, computed_field, field_validator
 
 from app.models.enums import Gravedad, TipoIncidente
-from app.schemas.proveedor import ProveedorResumen
+from app.schemas.proveedor import ProveedorConRiesgo
 from app.services.calificacion import promedio_evaluacion
 
 Calificacion = Annotated[int, Field(ge=1, le=5)]
@@ -125,5 +125,7 @@ class ObservacionOut(BaseModel):
     fecha: datetime
 
 
-class ProveedorAtencion(ProveedorResumen):
+class ProveedorAtencion(ProveedorConRiesgo):
     incidentes_abiertos: int
+    # Por qué aparece en la lista: "en_seguimiento" y/o "riesgo_alto"
+    motivos: list[str] = []

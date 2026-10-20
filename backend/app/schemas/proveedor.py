@@ -12,7 +12,7 @@ from pydantic import (
     model_validator,
 )
 
-from app.models.enums import EstadoProveedor, Moneda, TipoProveedor
+from app.models.enums import EstadoProveedor, Moneda, NivelRiesgo, TipoProveedor
 from app.services.vigencia import estado_tarifa
 
 Texto = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
@@ -143,6 +143,13 @@ class ProveedorResumen(BaseModel):
     estado: EstadoProveedor
 
 
+class ProveedorConRiesgo(ProveedorResumen):
+    """Resumen con el último riesgo guardado. Es nulo mientras no se haya calculado."""
+
+    riesgo_nivel: Optional[NivelRiesgo] = None
+    riesgo_puntaje: Optional[int] = None
+
+
 class ProveedorDetalle(ProveedorResumen):
     contacto_nombre: Optional[str]
     contacto_correo: Optional[str]
@@ -153,7 +160,7 @@ class ProveedorDetalle(ProveedorResumen):
 
 
 class PaginaProveedores(BaseModel):
-    items: list[ProveedorResumen]
+    items: list[ProveedorConRiesgo]
     total: int
     pagina: int
     tamano: int
