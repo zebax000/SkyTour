@@ -15,10 +15,13 @@ from app.schemas.documento import (
     DocumentoCambios,
     DocumentoIn,
     DocumentoOut,
+    ExtraccionIn,
+    ExtraccionOut,
     PaginaDocumentos,
     ResumenDocumentos,
 )
 from app.services.archivos import ArchivoInvalido, leer_archivo
+from app.services.extraccion_documento import extraer_datos
 from app.services.vigencia import hoy
 
 router = APIRouter(tags=["documentos"])
@@ -88,6 +91,17 @@ def resumen(db: Session = Depends(get_db)):
     return {"vigentes": contar("vigente"), "por_vencer": contar("por_vencer"), "vencidos": contar("vencido")}
 
 
+@router.post("/documentos/extraer", response_model=ExtraccionOut)
+def extraer(datos: ExtraccionIn, _admin: Usuario = Depends(solo_admin)):
+    """Propone el tipo y las fechas leyendo el archivo con IA. No guarda nada ni usa la base de datos:
+    la persona revisa y confirma los valores en el formulario."""
+    try:
+        leido = leer_archivo(datos.archivo.nombre, datos.archivo.contenido_base64)
+    except ArchivoInvalido as error:
+        raise _invalido(error)
+    return extraer_datos(leido.datos, leido.tipo_mime)
+
+
 @router.get(
     "/proveedores/{proveedor_id}/documentos",
     response_model=list[DocumentoOut],
@@ -131,8 +145,8 @@ def crear(
         ),
     )
     db.add(documento)
+    # El riesgo se recalcula solo: services/recalculo_automatico.py reacciona a este commit
     db.commit()
-    # TODO(ia): recalcular el riesgo del proveedor al registrar un documento (fase 7)
     return documento
 
 

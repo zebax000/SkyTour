@@ -51,6 +51,12 @@ class DocumentoCambios(BaseModel):
         return valor
 
 
+class ExtraccionIn(BaseModel):
+    """Archivo cuyo tipo y fechas se quieren leer con IA. No se guarda."""
+
+    archivo: ArchivoIn
+
+
 # ---------- Salida ----------
 class ArchivoOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -97,3 +103,16 @@ class ResumenDocumentos(BaseModel):
     vigentes: int
     por_vencer: int
     vencidos: int
+
+
+class ExtraccionOut(BaseModel):
+    """Valores propuestos por la IA. Siempre los revisa una persona antes de guardar."""
+
+    origen: str  # "gemini" o "ninguno"
+    tipo: Optional[str] = None
+    fecha_emision: Optional[date] = None
+    fecha_vencimiento: Optional[date] = None
+    modelo: Optional[str] = None
+    modelo_solicitado: Optional[str] = None
+    motivo: Optional[str] = None
+    advertencia: Optional[str] = None
