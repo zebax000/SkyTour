@@ -1,0 +1,59 @@
+/* Inicio de sesión: logo en grande y acentos dorados de la marca */
+.login {
+  background: radial-gradient(circle at 50% 0%, #14396b 0%, var(--azul) 55%, #071a33 100%);
+}
+
+.login .tarjeta-login {
+  max-width: 400px;
+  padding: 32px 32px 28px;
+  border-top: 5px solid var(--dorado);
+  border-radius: 14px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+}
+
+.login .logo-login {
+  width: 210px;
+  max-width: 70%;
+  margin: 0 auto 8px;
+}
+
+.login .tarjeta-login h1 {
+  position: relative;
+  margin-bottom: 8px;
+  padding-bottom: 14px;
+  font-size: 1.3rem;
+  text-align: center;
+}
+
+.login .tarjeta-login h1::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 48px;
+  height: 3px;
+  background: var(--dorado);
+  border-radius: 2px;
+  transform: translateX(-50%);
+}
+
+.login .tarjeta-login .ayuda {
+  text-align: center;
+}
+
+.login .tarjeta-login input:focus {
+  border-color: var(--dorado);
+  outline: 3px solid rgba(201, 162, 75, 0.35);
+  outline-offset: 0;
+}
+
+.login .boton.primario {
+  border-color: var(--dorado);
+  transition: background 0.15s, color 0.15s;
+}
+
+.login .boton.primario:hover:not(:disabled),
+.login .boton.primario:focus-visible {
+  color: var(--azul);
+  background: var(--dorado);
+}

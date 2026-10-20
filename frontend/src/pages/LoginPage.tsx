@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 
 import { useAuth } from "../auth/useAuth";
+import "./LoginPage.css";
 
 export function LoginPage() {
   const { usuario, iniciarSesion } = useAuth();
