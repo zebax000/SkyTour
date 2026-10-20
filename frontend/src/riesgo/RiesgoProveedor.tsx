@@ -18,6 +18,21 @@ const ETIQUETA_FACTOR: Record<string, string> = {
   tarifas: "Tarifas",
 };
 
+const ETIQUETA_MOTIVO: Record<string, string> = {
+  sin_clave: "No hay una clave de Gemini configurada en el servidor.",
+  sin_datos: "No hay datos suficientes para consultar a Gemini.",
+  limite_de_frecuencia: "Se alcanzó el límite de una solicitud cada 15 segundos. Espera un momento e inténtalo de nuevo.",
+  clave_invalida_o_solicitud_rechazada: "Gemini rechazó la clave o la solicitud (error 400). Revisa que la clave sea válida.",
+  clave_o_permiso_rechazado: "Gemini rechazó la clave o sus permisos (error 401 o 403).",
+  modelo_no_disponible: "El modelo no está disponible para esta cuenta (error 404). Define otro en GEMINI_MODEL.",
+  cuota_agotada: "Se agotó la cuota de Gemini (error 429). Espera o revisa el plan de la cuenta.",
+  servicio_saturado: "El servicio de Gemini falló o está saturado (error 5xx). Inténtalo más tarde.",
+  tiempo_agotado: "Gemini tardó más de 10 segundos en responder.",
+  sdk_no_instalado: "La librería de Gemini no está instalada en el servidor.",
+  respuesta_invalida: "Gemini respondió con un formato que no se pudo validar.",
+  error_desconocido: "Error desconocido. Revisa los registros del servidor.",
+};
+
 function mensajeDe(e: unknown, porDefecto: string): string {
   return e instanceof Error ? e.message : porDefecto;
 }
@@ -63,9 +78,9 @@ export function RiesgoProveedor({ proveedorId, puedeRegistrar }: { proveedorId: 
     setOcupado("explicar");
     setError(null);
     try {
-      const { resumen, acciones, origen, modelo, aviso, ...calculo } = await riesgoApi.explicar(proveedorId);
+      const { resumen, acciones, origen, modelo, motivo, aviso, ...calculo } = await riesgoApi.explicar(proveedorId);
       setResultado(calculo);
-      setExplicacion({ resumen, acciones, origen, modelo, aviso });
+      setExplicacion({ resumen, acciones, origen, modelo, motivo, aviso });
     } catch (e) {
       setError(mensajeDe(e, "No se pudo generar la explicación."));
     } finally {
@@ -139,6 +154,11 @@ export function RiesgoProveedor({ proveedorId, puedeRegistrar }: { proveedorId: 
               : "Generado con reglas internas; Gemini no se usó."}{" "}
             {explicacion.aviso}
           </p>
+          {explicacion.origen === "reglas" && explicacion.motivo && (
+            <p className="meta">
+              Motivo: {ETIQUETA_MOTIVO[explicacion.motivo] ?? explicacion.motivo}
+            </p>
+          )}
         </div>
       )}
     </div>
