@@ -7,7 +7,9 @@ import { InicioPage } from "./pages/InicioPage";
 import { LoginPage } from "./pages/LoginPage";
 import { NoEncontradaPage } from "./pages/NoEncontradaPage";
 import { PaginaPendiente } from "./pages/PaginaPendiente";
+import { ProveedorEditarPage } from "./pages/ProveedorEditarPage";
 import { ProveedorFichaPage } from "./pages/ProveedorFichaPage";
+import { ProveedorNuevoPage } from "./pages/ProveedorNuevoPage";
 import { ProveedoresPage } from "./pages/ProveedoresPage";
 import { SinPermisoPage } from "./pages/SinPermisoPage";
 
@@ -21,7 +23,10 @@ export default function App() {
           <Route index element={<InicioPage />} />
 
           <Route path="proveedores" element={<ProveedoresPage />} />
-          {/* TODO(frontend): "proveedores/nuevo" (alta por pasos) y edición, en la siguiente entrega de la fase 4 */}
+          <Route element={<RequireRole roles={["administrador"]} />}>
+            <Route path="proveedores/nuevo" element={<ProveedorNuevoPage />} />
+            <Route path="proveedores/:id/editar" element={<ProveedorEditarPage />} />
+          </Route>
           <Route path="proveedores/:id" element={<ProveedorFichaPage />} />
 
           {/* TODO(frontend): cada página pendiente se reemplaza en la fase indicada */}

@@ -109,22 +109,29 @@ export function ProveedorFichaPage() {
           </div>
         </div>
 
-        {opcionesEstado.length > 0 && (
-          <label className="campo cambio-estado">
-            <span>Cambiar estado</span>
-            <select
-              value={proveedor.estado}
-              disabled={guardando}
-              onChange={(e) => cambiarEstado(e.target.value as EstadoProveedor)}
-            >
-              {opcionesEstado.map((s) => (
-                <option key={s} value={s}>
-                  {ETIQUETA_ESTADO[s]}
-                </option>
-              ))}
-            </select>
-          </label>
-        )}
+        <div className="acciones-ficha">
+          {usuario.rol === "administrador" && (
+            <Link to={`/proveedores/${proveedor.id}/editar`} className="boton secundario pequeno">
+              Editar datos
+            </Link>
+          )}
+          {opcionesEstado.length > 0 && (
+            <label className="campo cambio-estado">
+              <span>Cambiar estado</span>
+              <select
+                value={proveedor.estado}
+                disabled={guardando}
+                onChange={(e) => cambiarEstado(e.target.value as EstadoProveedor)}
+              >
+                {opcionesEstado.map((s) => (
+                  <option key={s} value={s}>
+                    {ETIQUETA_ESTADO[s]}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+        </div>
       </div>
 
       {errorEstado && (

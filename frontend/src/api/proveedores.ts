@@ -1,7 +1,9 @@
 import type {
   EstadoProveedor,
+  Moneda,
   PaginaProveedores,
   ProveedorDetalle,
+  TipoProveedor,
 } from "../proveedores/tipos";
 import { apiFetch } from "./client";
 
@@ -12,6 +14,34 @@ export interface FiltrosProveedores {
   estado?: string;
   pagina?: number;
   tamano?: number;
+}
+
+export interface TarifaEntrada {
+  valor: string;
+  moneda: Moneda;
+  vigente_desde: string;
+  vigente_hasta: string | null;
+}
+
+export interface ServicioEntrada {
+  nombre: string;
+  descripcion: string | null;
+  tarifas: TarifaEntrada[];
+}
+
+export interface ProveedorCambios {
+  nombre: string;
+  nit: string;
+  tipo: TipoProveedor;
+  ciudad: string;
+  contacto_nombre: string | null;
+  contacto_correo: string | null;
+  contacto_telefono: string | null;
+}
+
+export interface ProveedorEntrada extends ProveedorCambios {
+  servicios: ServicioEntrada[];
+  zonas: string[];
 }
 
 function consulta(filtros: FiltrosProveedores): string {
@@ -32,5 +62,15 @@ export const proveedoresApi = {
     apiFetch<ProveedorDetalle>(`/proveedores/${id}/estado`, {
       method: "PATCH",
       body: JSON.stringify({ estado }),
+    }),
+  crear: (datos: ProveedorEntrada) =>
+    apiFetch<ProveedorDetalle>("/proveedores", {
+      method: "POST",
+      body: JSON.stringify(datos),
+    }),
+  actualizar: (id: number, cambios: ProveedorCambios) =>
+    apiFetch<ProveedorDetalle>(`/proveedores/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(cambios),
     }),
 };

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { proveedoresApi } from "../api/proveedores";
+import { useAuth } from "../auth/useAuth";
 import { InsigniaEstado } from "../proveedores/Insignias";
 import {
   ESTADOS,
@@ -14,6 +15,7 @@ import {
 const TAMANO = 10;
 
 export function ProveedoresPage() {
+  const { usuario } = useAuth();
   const [busqueda, setBusqueda] = useState("");
   const [q, setQ] = useState("");
   const [tipo, setTipo] = useState("");
@@ -83,9 +85,16 @@ export function ProveedoresPage() {
     <section>
       <div className="encabezado-pagina">
         <h1>Proveedores</h1>
-        <p className="ayuda" aria-live="polite">
-          {datos ? `${total} ${total === 1 ? "proveedor" : "proveedores"}` : ""}
-        </p>
+        <div className="acciones-encabezado">
+          <p className="ayuda" aria-live="polite">
+            {datos ? `${total} ${total === 1 ? "proveedor" : "proveedores"}` : ""}
+          </p>
+          {usuario?.rol === "administrador" && (
+            <Link to="/proveedores/nuevo" className="boton primario pequeno">
+              Nuevo proveedor
+            </Link>
+          )}
+        </div>
       </div>
 
       <div className="barra-filtros" role="search">
