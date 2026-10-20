@@ -3,13 +3,14 @@ import { Link, useParams } from "react-router-dom";
 
 import { proveedoresApi } from "../api/proveedores";
 import { useAuth } from "../auth/useAuth";
-import { InsigniaEstado, InsigniaVigencia } from "../proveedores/Insignias";
+import { GestionServicios } from "../proveedores/GestionServicios";
+import { GestionZonas } from "../proveedores/GestionZonas";
+import { InsigniaEstado } from "../proveedores/Insignias";
 import {
   ETIQUETA_ESTADO,
   ETIQUETA_TIPO,
   estadosPermitidos,
   formatearFecha,
-  formatearValor,
   type EstadoProveedor,
   type ProveedorDetalle,
 } from "../proveedores/tipos";
@@ -57,6 +58,12 @@ export function ProveedorFichaPage() {
     };
   }, [id]);
 
+  // Vuelve a pedir la ficha después de agregar o quitar servicios, tarifas o zonas
+  async function recargar() {
+    if (!proveedor) return;
+    setProveedor(await proveedoresApi.detalle(proveedor.id));
+  }
+
   async function cambiarEstado(nuevo: EstadoProveedor) {
     if (!proveedor || nuevo === proveedor.estado) return;
     if (nuevo === "suspendido" || nuevo === "inactivo") {
@@ -92,6 +99,7 @@ export function ProveedorFichaPage() {
   if (!proveedor || !usuario) return <p className="estado-carga">Cargando proveedor…</p>;
 
   const opcionesEstado = estadosPermitidos(usuario.rol, proveedor.estado);
+  const esAdministrador = usuario.rol === "administrador";
 
   return (
     <section>
@@ -110,7 +118,7 @@ export function ProveedorFichaPage() {
         </div>
 
         <div className="acciones-ficha">
-          {usuario.rol === "administrador" && (
+          {esAdministrador && (
             <Link to={`/proveedores/${proveedor.id}/editar`} className="boton secundario pequeno">
               Editar datos
             </Link>
@@ -159,8 +167,12 @@ export function ProveedorFichaPage() {
 
       <div className="panel" role="tabpanel" id={`panel-${pestana}`} aria-labelledby={`pestana-${pestana}`}>
         {pestana === "datos" && <PanelDatos proveedor={proveedor} />}
-        {pestana === "servicios" && <PanelServicios proveedor={proveedor} />}
-        {pestana === "cobertura" && <PanelCobertura proveedor={proveedor} />}
+        {pestana === "servicios" && (
+          <GestionServicios proveedor={proveedor} puedeEditar={esAdministrador} alCambiar={recargar} />
+        )}
+        {pestana === "cobertura" && (
+          <GestionZonas proveedor={proveedor} puedeEditar={esAdministrador} alCambiar={recargar} />
+        )}
       </div>
     </section>
   );
@@ -204,67 +216,5 @@ function PanelDatos({ proveedor }: { proveedor: ProveedorDetalle }) {
         <dd>{formatearFecha(proveedor.creado_en)}</dd>
       </div>
     </dl>
-  );
-}
-
-function PanelServicios({ proveedor }: { proveedor: ProveedorDetalle }) {
-  if (proveedor.servicios.length === 0) {
-    return <p className="ayuda">Este proveedor aún no tiene servicios registrados.</p>;
-  }
-  return (
-    <div>
-      {proveedor.servicios.map((servicio) => {
-        // La tarifa más reciente primero; las anteriores quedan como historial
-        const tarifas = [...servicio.tarifas].sort((a, b) => b.vigente_desde.localeCompare(a.vigente_desde));
-        return (
-          <article key={servicio.id} className="servicio">
-            <h2>{servicio.nombre}</h2>
-            {servicio.descripcion && <p>{servicio.descripcion}</p>}
-            {tarifas.length === 0 ? (
-              <p className="ayuda">Sin tarifas registradas.</p>
-            ) : (
-              <div className="tabla-contenedor">
-                <table className="tabla">
-                  <caption className="sr-only">Tarifas de {servicio.nombre}</caption>
-                  <thead>
-                    <tr>
-                      <th scope="col">Valor</th>
-                      <th scope="col">Desde</th>
-                      <th scope="col">Hasta</th>
-                      <th scope="col">Estado</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {tarifas.map((t) => (
-                      <tr key={t.id}>
-                        <td>{formatearValor(t.valor, t.moneda)}</td>
-                        <td>{formatearFecha(t.vigente_desde)}</td>
-                        <td>{t.vigente_hasta ? formatearFecha(t.vigente_hasta) : "Sin fecha final"}</td>
-                        <td>
-                          <InsigniaVigencia estado={t.estado_vigencia} />
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </article>
-        );
-      })}
-    </div>
-  );
-}
-
-function PanelCobertura({ proveedor }: { proveedor: ProveedorDetalle }) {
-  if (proveedor.zonas.length === 0) {
-    return <p className="ayuda">Este proveedor aún no tiene zonas de cobertura registradas.</p>;
-  }
-  return (
-    <ul className="zonas">
-      {proveedor.zonas.map((z) => (
-        <li key={z.id}>{z.ciudad_o_region}</li>
-      ))}
-    </ul>
   );
 }

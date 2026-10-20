@@ -3,7 +3,10 @@ import type {
   Moneda,
   PaginaProveedores,
   ProveedorDetalle,
+  Servicio,
+  Tarifa,
   TipoProveedor,
+  Zona,
 } from "../proveedores/tipos";
 import { apiFetch } from "./client";
 
@@ -73,4 +76,25 @@ export const proveedoresApi = {
       method: "PATCH",
       body: JSON.stringify(cambios),
     }),
+  agregarServicio: (id: number, datos: ServicioEntrada) =>
+    apiFetch<Servicio>(`/proveedores/${id}/servicios`, {
+      method: "POST",
+      body: JSON.stringify(datos),
+    }),
+  quitarServicio: (id: number, servicioId: number) =>
+    apiFetch<void>(`/proveedores/${id}/servicios/${servicioId}`, { method: "DELETE" }),
+  agregarTarifa: (id: number, servicioId: number, datos: TarifaEntrada) =>
+    apiFetch<Tarifa>(`/proveedores/${id}/servicios/${servicioId}/tarifas`, {
+      method: "POST",
+      body: JSON.stringify(datos),
+    }),
+  quitarTarifa: (id: number, servicioId: number, tarifaId: number) =>
+    apiFetch<void>(`/proveedores/${id}/servicios/${servicioId}/tarifas/${tarifaId}`, { method: "DELETE" }),
+  agregarZona: (id: number, ciudadORegion: string) =>
+    apiFetch<Zona>(`/proveedores/${id}/zonas`, {
+      method: "POST",
+      body: JSON.stringify({ ciudad_o_region: ciudadORegion }),
+    }),
+  quitarZona: (id: number, zonaId: number) =>
+    apiFetch<void>(`/proveedores/${id}/zonas/${zonaId}`, { method: "DELETE" }),
 };

@@ -78,6 +78,19 @@ export function servicioVacio(): ServicioForm {
 
 const VALOR = /^\d{1,12}(\.\d{1,2})?$/;
 
+// Devuelve los problemas de una tarifa, redactados para ir después de un prefijo ("Servicio 1, tarifa 2: ...")
+export function validarTarifa(t: TarifaForm): string[] {
+  const problemas: string[] = [];
+  if (!VALOR.test(t.valor.trim())) {
+    problemas.push("escribe el valor solo con números y sin puntos de miles (ej. 280000 o 280000.50).");
+  }
+  if (!t.vigente_desde) problemas.push("elige desde cuándo es válida.");
+  else if (t.vigente_hasta && t.vigente_hasta < t.vigente_desde) {
+    problemas.push("la fecha final no puede ser anterior a la inicial.");
+  }
+  return problemas;
+}
+
 export function validarServicios(servicios: ServicioForm[]): string[] {
   const problemas: string[] = [];
   servicios.forEach((s, i) => {
@@ -87,14 +100,7 @@ export function validarServicios(servicios: ServicioForm[]): string[] {
     else if (nombre.length > 150) problemas.push(`${prefijo}: el nombre admite máximo 150 caracteres.`);
 
     s.tarifas.forEach((t, j) => {
-      const donde = `${prefijo}, tarifa ${j + 1}`;
-      if (!VALOR.test(t.valor.trim())) {
-        problemas.push(`${donde}: escribe el valor solo con números y sin puntos de miles (ej. 280000 o 280000.50).`);
-      }
-      if (!t.vigente_desde) problemas.push(`${donde}: elige desde cuándo es válida.`);
-      else if (t.vigente_hasta && t.vigente_hasta < t.vigente_desde) {
-        problemas.push(`${donde}: la fecha final no puede ser anterior a la inicial.`);
-      }
+      validarTarifa(t).forEach((p) => problemas.push(`${prefijo}, tarifa ${j + 1}: ${p}`));
     });
   });
   return problemas;
