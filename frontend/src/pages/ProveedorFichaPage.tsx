@@ -3,6 +3,9 @@ import { Link, useParams } from "react-router-dom";
 
 import { proveedoresApi } from "../api/proveedores";
 import { useAuth } from "../auth/useAuth";
+import { EvaluacionesProveedor } from "../desempeno/EvaluacionesProveedor";
+import { IncidentesProveedor } from "../desempeno/IncidentesProveedor";
+import { ObservacionesProveedor } from "../desempeno/ObservacionesProveedor";
 import { DocumentosProveedor } from "../documentos/DocumentosProveedor";
 import { GestionServicios } from "../proveedores/GestionServicios";
 import { GestionZonas } from "../proveedores/GestionZonas";
@@ -16,13 +19,16 @@ import {
   type ProveedorDetalle,
 } from "../proveedores/tipos";
 
-type Pestana = "datos" | "servicios" | "cobertura" | "documentos";
+type Pestana = "datos" | "servicios" | "cobertura" | "documentos" | "evaluaciones" | "incidentes" | "observaciones";
 
 const PESTANAS: { id: Pestana; etiqueta: string }[] = [
   { id: "datos", etiqueta: "Datos" },
   { id: "servicios", etiqueta: "Servicios y tarifas" },
   { id: "cobertura", etiqueta: "Cobertura" },
   { id: "documentos", etiqueta: "Documentos" },
+  { id: "evaluaciones", etiqueta: "Evaluaciones" },
+  { id: "incidentes", etiqueta: "Incidentes" },
+  { id: "observaciones", etiqueta: "Observaciones" },
 ];
 
 function mensajeDe(e: unknown, porDefecto: string): string {
@@ -102,6 +108,7 @@ export function ProveedorFichaPage() {
 
   const opcionesEstado = estadosPermitidos(usuario.rol, proveedor.estado);
   const esAdministrador = usuario.rol === "administrador";
+  const puedeRegistrar = esAdministrador || usuario.rol === "evaluador";
 
   return (
     <section>
@@ -177,6 +184,15 @@ export function ProveedorFichaPage() {
         )}
         {pestana === "documentos" && (
           <DocumentosProveedor proveedorId={proveedor.id} puedeEditar={esAdministrador} />
+        )}
+        {pestana === "evaluaciones" && (
+          <EvaluacionesProveedor proveedorId={proveedor.id} puedeRegistrar={puedeRegistrar} />
+        )}
+        {pestana === "incidentes" && (
+          <IncidentesProveedor proveedorId={proveedor.id} puedeRegistrar={puedeRegistrar} />
+        )}
+        {pestana === "observaciones" && (
+          <ObservacionesProveedor proveedorId={proveedor.id} puedeRegistrar={puedeRegistrar} />
         )}
       </div>
     </section>

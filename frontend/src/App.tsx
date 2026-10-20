@@ -4,6 +4,8 @@ import { Layout } from "./components/Layout";
 import { RequireAuth } from "./components/RequireAuth";
 import { RequireRole } from "./components/RequireRole";
 import { DocumentosPage } from "./pages/DocumentosPage";
+import { EvaluacionesPage } from "./pages/EvaluacionesPage";
+import { IncidentesPage } from "./pages/IncidentesPage";
 import { InicioPage } from "./pages/InicioPage";
 import { LoginPage } from "./pages/LoginPage";
 import { NoEncontradaPage } from "./pages/NoEncontradaPage";
@@ -31,16 +33,10 @@ export default function App() {
           <Route path="proveedores/:id" element={<ProveedorFichaPage />} />
 
           <Route path="documentos" element={<DocumentosPage />} />
+          <Route path="evaluaciones" element={<EvaluacionesPage />} />
+          <Route path="incidentes" element={<IncidentesPage />} />
 
           {/* TODO(frontend): cada página pendiente se reemplaza en la fase indicada */}
-          <Route
-            path="evaluaciones"
-            element={<PaginaPendiente titulo="Evaluaciones" fase="Fase 6" descripcion="Calificación de 1 a 5 en calidad, puntualidad, cumplimiento y precio." />}
-          />
-          <Route
-            path="incidentes"
-            element={<PaginaPendiente titulo="Incidentes" fase="Fase 6" descripcion="Incidentes e incumplimientos con fecha y gravedad, y lista de atención." />}
-          />
           <Route
             path="comparador"
             element={<PaginaPendiente titulo="Comparador" fase="Fase 8" descripcion="De 2 a 4 proveedores lado a lado." />}
