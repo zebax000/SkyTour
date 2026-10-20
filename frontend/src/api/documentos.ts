@@ -25,6 +25,18 @@ export interface DocumentoCambios {
   archivo?: ArchivoEntrada;
 }
 
+// Valores que propone la IA al leer un archivo; nunca se guardan solos
+export interface ExtraccionDocumento {
+  origen: "gemini" | "ninguno";
+  tipo: string | null;
+  fecha_emision: string | null;
+  fecha_vencimiento: string | null;
+  modelo: string | null;
+  modelo_solicitado: string | null;
+  motivo: string | null;
+  advertencia: string | null;
+}
+
 export interface FiltrosDocumentos {
   estado?: string;
   q?: string;
@@ -56,6 +68,12 @@ export const documentosApi = {
       body: JSON.stringify(cambios),
     }),
   quitar: (id: number) => apiFetch<void>(`/documentos/${id}`, { method: "DELETE" }),
+  // Lee el archivo con IA y devuelve una propuesta; no guarda nada
+  extraer: (archivo: ArchivoEntrada) =>
+    apiFetch<ExtraccionDocumento>("/documentos/extraer", {
+      method: "POST",
+      body: JSON.stringify({ archivo }),
+    }),
   // El archivo se pide con la sesión (no es un enlace público), por eso se descarga como Blob
   async descargar(id: number): Promise<Blob> {
     const token = tokenStorage.get();

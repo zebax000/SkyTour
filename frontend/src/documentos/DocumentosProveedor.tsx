@@ -28,6 +28,21 @@ interface Errores {
   archivo?: string;
 }
 
+const ETIQUETA_MOTIVO_LECTURA: Record<string, string> = {
+  sin_clave: "La lectura con IA no está configurada en el servidor.",
+  limite_de_frecuencia: "Espera unos segundos y vuelve a intentarlo.",
+  clave_invalida_o_solicitud_rechazada: "Gemini rechazó la clave o la solicitud (error 400).",
+  clave_o_permiso_rechazado: "Gemini rechazó la clave o sus permisos (error 401 o 403).",
+  modelo_no_disponible: "Gemini respondió 404: no encontró el modelo o la operación. El detalle está en los registros del servidor.",
+  cuota_agotada: "Se agotó la cuota de Gemini (error 429). Espera o revisa el plan de la cuenta.",
+  servicio_saturado: "El servicio de Gemini falló o está saturado. Inténtalo más tarde.",
+  tiempo_agotado: "Gemini tardó demasiado en responder.",
+  sdk_no_instalado: "La librería de Gemini no está instalada en el servidor.",
+  respuesta_invalida: "Gemini respondió con un formato que no se pudo validar.",
+  sin_datos_legibles: "La IA no pudo leer datos en este archivo.",
+  error_desconocido: "Error desconocido. Revisa los registros del servidor.",
+};
+
 function mensajeDe(e: unknown, porDefecto: string): string {
   return e instanceof Error ? e.message : porDefecto;
 }
@@ -46,6 +61,8 @@ export function DocumentosProveedor({ proveedorId, puedeEditar }: Props) {
   const [claveArchivo, setClaveArchivo] = useState(0);
   const [errores, setErrores] = useState<Errores>({});
   const [enviando, setEnviando] = useState(false);
+  const [leyendo, setLeyendo] = useState(false);
+  const [avisoIA, setAvisoIA] = useState<string | null>(null);
 
   useEffect(() => {
     let vigente = true;
@@ -69,6 +86,7 @@ export function DocumentosProveedor({ proveedorId, puedeEditar }: Props) {
     setArchivo(null);
     setClaveArchivo((k) => k + 1);
     setErrores({});
+    setAvisoIA(null);
   }
 
   function abrirNuevo() {
@@ -107,6 +125,54 @@ export function DocumentosProveedor({ proveedorId, puedeEditar }: Props) {
       e.archivo = "Elige el archivo del documento (PDF, JPG o PNG).";
     }
     return e;
+  }
+
+  // Pide a la IA que lea el archivo elegido y rellena el formulario; nada se guarda hasta que la persona confirme
+  async function leerConIA() {
+    if (!archivo) return;
+    const problema = validarArchivoLocal(archivo);
+    if (problema) {
+      setErrores((anteriores) => ({ ...anteriores, archivo: problema }));
+      return;
+    }
+    setLeyendo(true);
+    setAvisoIA(null);
+    setErrorGeneral(null);
+    try {
+      const propuesta = await documentosApi.extraer({
+        nombre: archivo.name,
+        contenido_base64: await archivoABase64(archivo),
+      });
+      if (propuesta.origen !== "gemini") {
+        const motivo = propuesta.motivo ? (ETIQUETA_MOTIVO_LECTURA[propuesta.motivo] ?? propuesta.motivo) : "No se pudo leer el documento.";
+        setAvisoIA(`${motivo} Completa los datos a mano.${propuesta.advertencia ? ` ${propuesta.advertencia}` : ""}`);
+        return;
+      }
+      const leidos: string[] = [];
+      if (propuesta.tipo) {
+        setTipo(propuesta.tipo);
+        leidos.push("el tipo");
+      }
+      if (propuesta.fecha_emision) {
+        setEmision(propuesta.fecha_emision);
+        leidos.push("la fecha de emisión");
+      }
+      if (propuesta.fecha_vencimiento) {
+        setVencimiento(propuesta.fecha_vencimiento);
+        leidos.push("la fecha de vencimiento");
+      }
+      setErrores({});
+      const faltan = 3 - leidos.length;
+      setAvisoIA(
+        `La IA propuso ${leidos.join(", ")}. Revisa los datos antes de guardar.` +
+          (faltan > 0 ? ` No pudo leer ${faltan === 1 ? "un dato" : `${faltan} datos`}: completa lo que falta.` : "") +
+          (propuesta.advertencia ? ` ${propuesta.advertencia}` : ""),
+      );
+    } catch (e) {
+      setAvisoIA(`${mensajeDe(e, "No se pudo leer el documento.")} Completa los datos a mano.`);
+    } finally {
+      setLeyendo(false);
+    }
   }
 
   async function guardar(evento: FormEvent<HTMLFormElement>) {
@@ -247,7 +313,10 @@ export function DocumentosProveedor({ proveedorId, puedeEditar }: Props) {
                 id="doc-archivo"
                 type="file"
                 accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
-                onChange={(e) => setArchivo(e.target.files?.[0] ?? null)}
+                onChange={(e) => {
+                  setArchivo(e.target.files?.[0] ?? null);
+                  setAvisoIA(null);
+                }}
                 aria-invalid={errores.archivo ? true : undefined}
                 aria-describedby="ayuda-doc-archivo"
               />
@@ -255,13 +324,29 @@ export function DocumentosProveedor({ proveedorId, puedeEditar }: Props) {
                 Máximo {MAX_ARCHIVO_MB} MB.{editando ? " Si no eliges uno, se conserva el actual." : ""}
               </p>
               {errores.archivo && <p className="error-campo">{errores.archivo}</p>}
+              {archivo && (
+                <div>
+                  <button type="button" className="boton secundario pequeno" disabled={leyendo || enviando} onClick={leerConIA}>
+                    {leyendo ? "Leyendo…" : "Leer con IA"}
+                  </button>
+                  <p className="ayuda">
+                    Al pulsar, el archivo se envía a Gemini (Google) para proponer el tipo y las fechas. Nada se guarda hasta que
+                    tú confirmes.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
+          {avisoIA && (
+            <p className="ayuda" role="status">
+              {avisoIA}
+            </p>
+          )}
           <div className="acciones-formulario">
             <button type="button" className="boton secundario pequeno" onClick={cerrarFormulario}>
               Cancelar
             </button>
-            <button type="submit" className="boton primario pequeno" disabled={enviando}>
+            <button type="submit" className="boton primario pequeno" disabled={enviando || leyendo}>
               {enviando ? "Guardando…" : editando ? "Guardar cambios" : "Guardar documento"}
             </button>
           </div>
