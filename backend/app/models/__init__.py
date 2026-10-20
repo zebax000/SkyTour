@@ -1,5 +1,5 @@
 from app.models.desempeno import Evaluacion, Incidente, Observacion
-from app.models.documento import Documento
+from app.models.documento import Documento, DocumentoArchivo
 from app.models.enums import (
     EstadoProveedor,
     FactorRiesgo,
@@ -18,6 +18,7 @@ __all__ = [
     "AnalisisRiesgo",
     "AnalisisRiesgoFactor",
     "Documento",
+    "DocumentoArchivo",
     "EstadoProveedor",
     "Evaluacion",
     "FactorRiesgo",
