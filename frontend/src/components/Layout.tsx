@@ -3,6 +3,7 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { MENU } from "../auth/menu";
 import { ETIQUETA_ROL } from "../auth/tipos";
 import { useAuth } from "../auth/useAuth";
+import { Logo } from "./Logo";
 
 export function Layout() {
   const { usuario, cerrarSesion } = useAuth();
@@ -20,7 +21,7 @@ export function Layout() {
   return (
     <div className="app">
       <aside className="menu-lateral">
-        <img className="logo-menu" src="/logo-claro.png" alt="SkyTour: gestión de proveedores turísticos" />
+        <Logo claro className="logo-menu" />
         <nav aria-label="Principal">
           <ul>
             {items.map((item) => (

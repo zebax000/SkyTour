@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 
 import { useAuth } from "../auth/useAuth";
+import { Logo } from "../components/Logo";
 import "./LoginPage.css";
 
 export function LoginPage() {
@@ -33,7 +34,7 @@ export function LoginPage() {
   return (
     <main className="login">
       <form className="tarjeta-login" onSubmit={enviar}>
-        <img className="logo-login" src="/logo.png" alt="SkyTour" />
+        <Logo className="logo-login" />
         <h1>Iniciar sesión</h1>
         <p className="ayuda">Gestión y evaluación de proveedores turísticos.</p>
 
