@@ -1,4 +1,13 @@
+from datetime import datetime, timedelta, timezone
+from typing import Any, Optional
+
+import jwt
 from pwdlib import PasswordHash
+
+from app.core.config import settings
+
+ALGORITMO = "HS256"  # único algoritmo aceptado: nunca se lee del token
+SECRET_POR_DEFECTO = "cambia-esta-clave"
 
 _hasher = PasswordHash.recommended()  # Argon2
 
@@ -11,4 +20,29 @@ def verify_password(password: str, password_hash: str) -> bool:
     return _hasher.verify(password, password_hash)
 
 
-# TODO(backend): en la fase 3 se agregan aquí la creación y verificación de JWT.
+# Hash falso para gastar el mismo tiempo cuando el correo no existe (evita adivinar cuentas por el tiempo)
+HASH_FALSO = hash_password("contrasena-falsa-solo-para-igualar-tiempos")
+
+
+def _clave() -> str:
+    if settings.secret_key == SECRET_POR_DEFECTO:
+        raise RuntimeError("SECRET_KEY sigue con el valor por defecto: genera una clave aleatoria en el .env.")
+    return settings.secret_key
+
+
+def create_access_token(user_id: int, rol: str, expires_minutes: Optional[int] = None) -> str:
+    """Crea un JWT firmado. Solo lleva datos no sensibles: id, rol (para la interfaz), emisión y vencimiento."""
+    minutos = settings.access_token_expire_minutes if expires_minutes is None else expires_minutes
+    ahora = datetime.now(timezone.utc)
+    payload: dict[str, Any] = {
+        "sub": str(user_id),
+        "rol": rol,
+        "iat": ahora,
+        "exp": ahora + timedelta(minutes=minutos),
+    }
+    return jwt.encode(payload, _clave(), algorithm=ALGORITMO)
+
+
+def decode_access_token(token: str) -> dict[str, Any]:
+    """Verifica firma y vencimiento. Lanza jwt.InvalidTokenError si algo no cuadra."""
+    return jwt.decode(token, _clave(), algorithms=[ALGORITMO], options={"require": ["exp", "sub"]})
