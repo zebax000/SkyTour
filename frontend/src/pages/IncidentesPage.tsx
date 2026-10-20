@@ -123,7 +123,11 @@ export function IncidentesPage() {
                     <td>
                       <InsigniaRiesgo nivel={p.riesgo_nivel} puntaje={p.riesgo_puntaje} />
                     </td>
-                    <td>{p.motivos.map((m) => ETIQUETA_MOTIVO_ATENCION[m] ?? m).join(" y ")}</td>
+                    <td>
+                      {(p.motivos ?? []).length > 0
+                        ? (p.motivos ?? []).map((m) => ETIQUETA_MOTIVO_ATENCION[m] ?? m).join(" y ")
+                        : "En seguimiento"}
+                    </td>
                     <td>{p.incidentes_abiertos}</td>
                   </tr>
                 ))}

@@ -17,12 +17,15 @@ export function InsigniaVigencia({ estado }: { estado: EstadoVigencia }) {
   return <span className={`insignia vigencia-${estado}`}>{ETIQUETA_VIGENCIA[estado]}</span>;
 }
 
-export function InsigniaRiesgo({ nivel, puntaje }: { nivel: NivelRiesgo | null; puntaje: number | null }) {
-  if (nivel === null) return <span className="insignia riesgo-sin_datos">Sin calcular</span>;
+// Acepta un nivel ausente (backend sin riesgo) o desconocido: nunca debe romper la pantalla
+export function InsigniaRiesgo({ nivel, puntaje }: { nivel?: NivelRiesgo | null; puntaje?: number | null }) {
+  if (nivel === null || nivel === undefined || !(nivel in ETIQUETA_NIVEL_RIESGO)) {
+    return <span className="insignia riesgo-sin_datos">Sin calcular</span>;
+  }
   return (
     <span className={`insignia riesgo-${nivel}`}>
       <span aria-hidden="true">{SIMBOLO_RIESGO[nivel]}</span> {ETIQUETA_NIVEL_RIESGO[nivel]}
-      {puntaje !== null ? ` · ${puntaje}` : ""}
+      {puntaje !== null && puntaje !== undefined ? ` · ${puntaje}` : ""}
     </span>
   );
 }
