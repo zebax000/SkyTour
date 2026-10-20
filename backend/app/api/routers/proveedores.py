@@ -7,12 +7,23 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.api.deps import get_current_user, require_roles
 from app.core.database import get_db
-from app.models import EstadoProveedor, Proveedor, Rol, Servicio, Tarifa, TipoProveedor, Usuario, ZonaCobertura
+from app.models import (
+    EstadoProveedor,
+    NivelRiesgo,
+    Proveedor,
+    Rol,
+    Servicio,
+    Tarifa,
+    TipoProveedor,
+    Usuario,
+    ZonaCobertura,
+)
 from app.schemas.proveedor import (
     EstadoIn,
     PaginaProveedores,
     ProveedorDetalle,
     ProveedorIn,
+    ProveedorResumen,
     ProveedorUpdate,
     ServicioIn,
     ServicioOut,
@@ -22,6 +33,7 @@ from app.schemas.proveedor import (
     ZonaOut,
 )
 from app.services.proveedores import puede_cambiar_estado
+from app.services.riesgo_lista import asegurar_analisis, con_nivel, riesgo_de
 
 router = APIRouter(prefix="/proveedores", tags=["proveedores"])
 
@@ -66,11 +78,11 @@ def listar(
     tipo: Optional[TipoProveedor] = None,
     ciudad: Optional[str] = None,
     estado: Optional[EstadoProveedor] = None,
+    riesgo: Optional[NivelRiesgo] = None,
     pagina: int = Query(1, ge=1),
     tamano: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db),
 ):
-    # TODO(ia): filtro por nivel de riesgo cuando exista el motor de riesgo (fase 7)
     consulta = select(Proveedor)
     if q and q.strip():
         patron = f"%{_escapar_like(q.strip())}%"
@@ -81,10 +93,22 @@ def listar(
         consulta = consulta.where(func.lower(Proveedor.ciudad) == ciudad.strip().lower())
     if estado is not None:
         consulta = consulta.where(Proveedor.estado == estado)
+    if riesgo is not None:
+        # Para filtrar hace falta el riesgo de todos: se calcula una sola vez a quien aún no lo tiene
+        asegurar_analisis(db)
+        consulta = consulta.where(con_nivel(riesgo))
 
     total = db.scalar(select(func.count()).select_from(consulta.subquery())) or 0
     filas = db.scalars(consulta.order_by(Proveedor.nombre).limit(tamano).offset((pagina - 1) * tamano)).all()
-    return {"items": filas, "total": total, "pagina": pagina, "tamano": tamano}
+
+    ids = [p.id for p in filas]
+    asegurar_analisis(db, ids)
+    por_proveedor = riesgo_de(db, ids)
+    items = []
+    for p in filas:
+        puntaje, nivel = por_proveedor.get(p.id, (None, None))
+        items.append({**ProveedorResumen.model_validate(p).model_dump(), "riesgo_nivel": nivel, "riesgo_puntaje": puntaje})
+    return {"items": items, "total": total, "pagina": pagina, "tamano": tamano}
 
 
 @router.get("/ciudades", response_model=list[str], dependencies=[Depends(get_current_user)])
@@ -121,8 +145,8 @@ def crear(datos: ProveedorIn, db: Session = Depends(get_db), _admin: Usuario = D
         zonas=[ZonaCobertura(ciudad_o_region=z) for z in datos.zonas],
     )
     db.add(proveedor)
+    # El riesgo inicial se calcula solo: services/recalculo_automatico.py reacciona a este commit
     _confirmar(db)
-    # TODO(ia): al crear un proveedor, calcular su riesgo inicial (fase 7)
     return _cargar(db, proveedor.id)
 
 
@@ -176,8 +200,8 @@ def agregar_servicio(
         tarifas=[Tarifa(**t.model_dump()) for t in datos.tarifas],
     )
     db.add(servicio)
+    # Un servicio nuevo sin tarifa vigente suma riesgo: el recálculo automático lo detecta en este commit
     _confirmar(db)
-    # TODO(ia): recalcular el riesgo cuando cambian las tarifas (fase 7)
     return servicio
 
 

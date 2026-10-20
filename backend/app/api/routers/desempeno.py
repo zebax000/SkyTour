@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
@@ -14,6 +14,7 @@ from app.models import (
     Evaluacion,
     Gravedad,
     Incidente,
+    NivelRiesgo,
     Observacion,
     Proveedor,
     TipoIncidente,
@@ -34,8 +35,10 @@ from app.schemas.desempeno import (
 )
 from app.schemas.proveedor import ProveedorResumen
 from app.services.calificacion import promedio_ultimas, suma_criterios
+from app.services.riesgo_lista import asegurar_analisis, con_nivel, motivos_de_atencion, riesgo_de
 
 # Evaluaciones, incidentes y observaciones. Registrar: administrador y evaluador. Consultar: cualquier usuario con sesión.
+# El riesgo del proveedor se recalcula solo al confirmar estos cambios (services/recalculo_automatico.py).
 router = APIRouter(tags=["desempeno"])
 
 LIMITE_HISTORIAL = 100
@@ -107,7 +110,6 @@ def evaluar(
     db.add(evaluacion)
     db.commit()
     db.refresh(evaluacion)
-    # TODO(ia): recalcular el riesgo del proveedor al registrar una evaluación (fase 7)
     return _fila(evaluacion, evaluador_nombre=usuario.nombre)
 
 
@@ -178,7 +180,6 @@ def registrar_incidente(
     db.add(incidente)
     db.commit()
     db.refresh(incidente)
-    # TODO(ia): recalcular el riesgo del proveedor al registrar un incidente o incumplimiento (fase 7)
     return _fila(incidente, registrado_por_nombre=usuario.nombre)
 
 
@@ -199,7 +200,6 @@ def resolver_incidente(
     incidente.comentario_cierre = datos.comentario
     db.commit()
     nombre = db.scalar(select(Usuario.nombre).where(Usuario.id == incidente.registrado_por)) or ""
-    # TODO(ia): recalcular el riesgo del proveedor al resolver un incidente (fase 7)
     return _fila(incidente, registrado_por_nombre=nombre)
 
 
@@ -284,8 +284,9 @@ def agregar_observacion(
 # Ruta propia (/atencion) para no chocar con /proveedores/{proveedor_id}
 @router.get("/atencion", response_model=list[ProveedorAtencion], dependencies=[Depends(get_current_user)])
 def lista_de_atencion(db: Session = Depends(get_db)):
-    """Proveedores que requieren atención. Por ahora: los marcados "En seguimiento".
-    TODO(ia): sumar los de riesgo alto cuando exista el cálculo de riesgo (fase 7)."""
+    """Proveedores que requieren atención: los marcados "En seguimiento" y los de riesgo alto.
+    Los inactivos no aparecen porque ya no operan."""
+    asegurar_analisis(db)
     abiertos = (
         select(func.count(Incidente.id))
         .where(Incidente.proveedor_id == Proveedor.id, Incidente.resuelto.is_(False))
@@ -294,7 +295,21 @@ def lista_de_atencion(db: Session = Depends(get_db)):
     )
     filas = db.execute(
         select(Proveedor, abiertos.label("abiertos"))
-        .where(Proveedor.estado == EstadoProveedor.en_seguimiento)
+        .where(Proveedor.estado != EstadoProveedor.inactivo)
+        .where(or_(Proveedor.estado == EstadoProveedor.en_seguimiento, con_nivel(NivelRiesgo.alto)))
         .order_by(abiertos.desc(), Proveedor.nombre)
     ).all()
-    return [{**ProveedorResumen.model_validate(p).model_dump(), "incidentes_abiertos": n} for p, n in filas]
+    por_proveedor = riesgo_de(db, [p.id for p, _ in filas])
+    resultado = []
+    for p, n in filas:
+        puntaje, nivel = por_proveedor.get(p.id, (None, None))
+        resultado.append(
+            {
+                **ProveedorResumen.model_validate(p).model_dump(),
+                "incidentes_abiertos": n,
+                "riesgo_nivel": nivel,
+                "riesgo_puntaje": puntaje,
+                "motivos": motivos_de_atencion(p.estado, nivel),
+            }
+        )
+    return resultado
