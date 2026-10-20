@@ -1,7 +1,8 @@
-import type { ProveedorResumen } from "../proveedores/tipos";
+import type { ProveedorConRiesgo } from "../proveedores/tipos";
 
 export type TipoIncidente = "incidente" | "incumplimiento";
 export type Gravedad = "baja" | "media" | "alta" | "critica";
+export type MotivoAtencion = "en_seguimiento" | "riesgo_alto";
 
 export interface Evaluacion {
   id: number;
@@ -69,8 +70,9 @@ export interface Observacion {
   fecha: string;
 }
 
-export interface ProveedorAtencion extends ProveedorResumen {
+export interface ProveedorAtencion extends ProveedorConRiesgo {
   incidentes_abiertos: number;
+  motivos: MotivoAtencion[];
 }
 
 export const ETIQUETA_TIPO_INCIDENTE: Record<TipoIncidente, string> = {
@@ -83,6 +85,11 @@ export const ETIQUETA_GRAVEDAD: Record<Gravedad, string> = {
   media: "Media",
   alta: "Alta",
   critica: "Crítica",
+};
+
+export const ETIQUETA_MOTIVO_ATENCION: Record<MotivoAtencion, string> = {
+  en_seguimiento: "En seguimiento",
+  riesgo_alto: "Riesgo alto",
 };
 
 // La gravedad nunca depende solo del color: lleva texto y un símbolo

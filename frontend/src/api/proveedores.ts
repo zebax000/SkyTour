@@ -15,6 +15,7 @@ export interface FiltrosProveedores {
   tipo?: string;
   ciudad?: string;
   estado?: string;
+  riesgo?: string;
   pagina?: number;
   tamano?: number;
 }

@@ -6,6 +6,7 @@ import "../desempeno/desempeno.css";
 import { InsigniaEstadoIncidente, InsigniaGravedad, InsigniaTipoIncidente } from "../desempeno/Insignias";
 import {
   ETIQUETA_GRAVEDAD,
+  ETIQUETA_MOTIVO_ATENCION,
   ETIQUETA_TIPO_INCIDENTE,
   GRAVEDADES,
   TIPOS_INCIDENTE,
@@ -13,7 +14,7 @@ import {
   type PaginaIncidentes,
   type ProveedorAtencion,
 } from "../desempeno/tipos";
-import { InsigniaEstado } from "../proveedores/Insignias";
+import { InsigniaEstado, InsigniaRiesgo } from "../proveedores/Insignias";
 import { ETIQUETA_TIPO } from "../proveedores/tipos";
 
 const TAMANO = 10;
@@ -83,8 +84,7 @@ export function IncidentesPage() {
       <div className="seccion-atencion">
         <h2>Requieren atención</h2>
         <p className="ayuda">
-          Proveedores marcados "En seguimiento". Cuando exista el cálculo de riesgo, aquí también aparecerán los de
-          riesgo alto.
+          Proveedores marcados "En seguimiento" o con riesgo alto. Los inactivos no aparecen.
         </p>
         {errorAtencion && (
           <p className="error" role="alert">
@@ -92,7 +92,7 @@ export function IncidentesPage() {
           </p>
         )}
         {atencion !== null && atencion.length === 0 && (
-          <p className="vacio">Ningún proveedor está en seguimiento por ahora.</p>
+          <p className="vacio">Ningún proveedor requiere atención por ahora.</p>
         )}
         {atencion !== null && atencion.length > 0 && (
           <div className="tabla-contenedor">
@@ -104,6 +104,8 @@ export function IncidentesPage() {
                   <th scope="col">Tipo</th>
                   <th scope="col">Ciudad</th>
                   <th scope="col">Estado</th>
+                  <th scope="col">Riesgo</th>
+                  <th scope="col">Motivo</th>
                   <th scope="col">Incidentes abiertos</th>
                 </tr>
               </thead>
@@ -118,6 +120,10 @@ export function IncidentesPage() {
                     <td>
                       <InsigniaEstado estado={p.estado} />
                     </td>
+                    <td>
+                      <InsigniaRiesgo nivel={p.riesgo_nivel} puntaje={p.riesgo_puntaje} />
+                    </td>
+                    <td>{p.motivos.map((m) => ETIQUETA_MOTIVO_ATENCION[m] ?? m).join(" y ")}</td>
                     <td>{p.incidentes_abiertos}</td>
                   </tr>
                 ))}

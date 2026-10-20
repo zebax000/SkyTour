@@ -3,11 +3,13 @@ import { Link } from "react-router-dom";
 
 import { proveedoresApi } from "../api/proveedores";
 import { useAuth } from "../auth/useAuth";
-import { InsigniaEstado } from "../proveedores/Insignias";
+import { InsigniaEstado, InsigniaRiesgo } from "../proveedores/Insignias";
 import {
   ESTADOS,
   ETIQUETA_ESTADO,
+  ETIQUETA_NIVEL_RIESGO,
   ETIQUETA_TIPO,
+  NIVELES_RIESGO,
   TIPOS,
   type PaginaProveedores,
 } from "../proveedores/tipos";
@@ -21,6 +23,7 @@ export function ProveedoresPage() {
   const [tipo, setTipo] = useState("");
   const [ciudad, setCiudad] = useState("");
   const [estado, setEstado] = useState("");
+  const [riesgo, setRiesgo] = useState("");
   const [pagina, setPagina] = useState(1);
   const [ciudades, setCiudades] = useState<string[]>([]);
   const [datos, setDatos] = useState<PaginaProveedores | null>(null);
@@ -48,7 +51,7 @@ export function ProveedoresPage() {
     setCargando(true);
     setError(null);
     proveedoresApi
-      .listar({ q, tipo, ciudad, estado, pagina, tamano: TAMANO })
+      .listar({ q, tipo, ciudad, estado, riesgo, pagina, tamano: TAMANO })
       .then((respuesta) => {
         if (vigente) setDatos(respuesta);
       })
@@ -61,7 +64,7 @@ export function ProveedoresPage() {
     return () => {
       vigente = false;
     };
-  }, [q, tipo, ciudad, estado, pagina]);
+  }, [q, tipo, ciudad, estado, riesgo, pagina]);
 
   function cambiarFiltro(poner: (valor: string) => void, valor: string) {
     poner(valor);
@@ -74,12 +77,13 @@ export function ProveedoresPage() {
     setTipo("");
     setCiudad("");
     setEstado("");
+    setRiesgo("");
     setPagina(1);
   }
 
   const total = datos?.total ?? 0;
   const paginas = Math.max(1, Math.ceil(total / TAMANO));
-  const hayFiltros = busqueda !== "" || tipo !== "" || ciudad !== "" || estado !== "";
+  const hayFiltros = busqueda !== "" || tipo !== "" || ciudad !== "" || estado !== "" || riesgo !== "";
 
   return (
     <section>
@@ -140,6 +144,17 @@ export function ProveedoresPage() {
             ))}
           </select>
         </label>
+        <label className="campo">
+          Riesgo
+          <select value={riesgo} onChange={(e) => cambiarFiltro(setRiesgo, e.target.value)}>
+            <option value="">Todos</option>
+            {NIVELES_RIESGO.map((n) => (
+              <option key={n} value={n}>
+                {ETIQUETA_NIVEL_RIESGO[n]}
+              </option>
+            ))}
+          </select>
+        </label>
         {hayFiltros && (
           <button type="button" className="boton secundario pequeno" onClick={limpiar}>
             Limpiar filtros
@@ -163,6 +178,7 @@ export function ProveedoresPage() {
               <th scope="col">Tipo</th>
               <th scope="col">Ciudad</th>
               <th scope="col">Estado</th>
+              <th scope="col">Riesgo</th>
             </tr>
           </thead>
           <tbody>
@@ -176,6 +192,9 @@ export function ProveedoresPage() {
                 <td>{p.ciudad}</td>
                 <td>
                   <InsigniaEstado estado={p.estado} />
+                </td>
+                <td>
+                  <InsigniaRiesgo nivel={p.riesgo_nivel} puntaje={p.riesgo_puntaje} />
                 </td>
               </tr>
             ))}

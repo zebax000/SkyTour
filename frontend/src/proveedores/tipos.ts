@@ -12,6 +12,7 @@ export type TipoProveedor =
 export type EstadoProveedor = "activo" | "en_seguimiento" | "suspendido" | "inactivo";
 export type Moneda = "COP" | "USD";
 export type EstadoVigencia = "vigente" | "vencida" | "futura";
+export type NivelRiesgo = "bajo" | "medio" | "alto" | "sin_datos";
 
 export interface Tarifa {
   id: number;
@@ -43,6 +44,12 @@ export interface ProveedorResumen {
   estado: EstadoProveedor;
 }
 
+// Último riesgo guardado; es nulo mientras no se haya calculado
+export interface ProveedorConRiesgo extends ProveedorResumen {
+  riesgo_nivel: NivelRiesgo | null;
+  riesgo_puntaje: number | null;
+}
+
 export interface ProveedorDetalle extends ProveedorResumen {
   contacto_nombre: string | null;
   contacto_correo: string | null;
@@ -53,7 +60,7 @@ export interface ProveedorDetalle extends ProveedorResumen {
 }
 
 export interface PaginaProveedores {
-  items: ProveedorResumen[];
+  items: ProveedorConRiesgo[];
   total: number;
   pagina: number;
   tamano: number;
@@ -82,8 +89,24 @@ export const ETIQUETA_VIGENCIA: Record<EstadoVigencia, string> = {
   futura: "Futura",
 };
 
+export const ETIQUETA_NIVEL_RIESGO: Record<NivelRiesgo, string> = {
+  bajo: "Riesgo bajo",
+  medio: "Riesgo medio",
+  alto: "Riesgo alto",
+  sin_datos: "Sin datos suficientes",
+};
+
+// El riesgo nunca depende solo del color: lleva texto y un símbolo
+export const SIMBOLO_RIESGO: Record<NivelRiesgo, string> = {
+  bajo: "●",
+  medio: "▲",
+  alto: "✖",
+  sin_datos: "–",
+};
+
 export const TIPOS = Object.keys(ETIQUETA_TIPO) as TipoProveedor[];
 export const ESTADOS = Object.keys(ETIQUETA_ESTADO) as EstadoProveedor[];
+export const NIVELES_RIESGO = Object.keys(ETIQUETA_NIVEL_RIESGO) as NivelRiesgo[];
 
 // Misma regla que el backend (el servidor es quien decide; esto solo evita mostrar opciones que darían error)
 export function estadosPermitidos(rol: Rol, actual: EstadoProveedor): EstadoProveedor[] {
