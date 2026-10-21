@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { RequireAuth } from "./components/RequireAuth";
 import { RequireRole } from "./components/RequireRole";
+import { ComparadorPage } from "./pages/ComparadorPage";
 import { DocumentosPage } from "./pages/DocumentosPage";
 import { EvaluacionesPage } from "./pages/EvaluacionesPage";
 import { IncidentesPage } from "./pages/IncidentesPage";
@@ -37,13 +38,9 @@ export default function App() {
           <Route path="evaluaciones" element={<EvaluacionesPage />} />
           <Route path="incidentes" element={<IncidentesPage />} />
           <Route path="reportes" element={<ReportesPage />} />
+          <Route path="comparador" element={<ComparadorPage />} />
 
           {/* TODO(frontend): cada página pendiente se reemplaza en la fase indicada */}
-          <Route
-            path="comparador"
-            element={<PaginaPendiente titulo="Comparador" fase="Fase 8" descripcion="De 2 a 4 proveedores lado a lado." />}
-          />
-
           <Route element={<RequireRole roles={["administrador"]} />}>
             <Route
               path="usuarios"
