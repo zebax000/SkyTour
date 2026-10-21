@@ -66,13 +66,100 @@
   gap: 12px;
 }
 
-.cmp-agregar .campo select {
-  min-width: 320px;
-  max-width: 100%;
-}
-
 .cmp-agregar .boton {
   margin: 0;
+}
+
+/* ---------- Buscador de proveedores ---------- */
+.cmp-buscador {
+  position: relative;
+  flex: 1;
+  min-width: 260px;
+  max-width: 560px;
+}
+
+.cmp-buscador .campo input {
+  width: 100%;
+  min-width: 0;
+  padding: 12px 14px;
+  font-size: 1rem;
+}
+
+.cmp-desplegable {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  z-index: 10;
+  margin-top: 6px;
+  padding: 8px;
+  background: #fff;
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(11, 37, 69, 0.14);
+}
+
+.cmp-resultados {
+  max-height: 340px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.cmp-opcion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.cmp-opcion[aria-selected="true"] {
+  background: #f3e9cf;
+}
+
+.cmp-opcion-texto {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cmp-opcion-nombre {
+  overflow: hidden;
+  font-weight: 600;
+  color: var(--azul);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cmp-opcion-meta {
+  font-size: 0.85rem;
+  color: #52606d;
+}
+
+.cmp-opcion-nota {
+  flex: none;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--azul);
+  font-variant-numeric: tabular-nums;
+}
+
+.cmp-resultados-vacio,
+.cmp-resultados-pie {
+  margin: 0;
+  padding: 10px 12px 4px;
+  font-size: 0.85rem;
+  color: #52606d;
+}
+
+.cmp-resultados-vacio {
+  padding-bottom: 10px;
+  text-align: center;
 }
 
 /* ---------- Tabla comparativa ---------- */
@@ -196,10 +283,4 @@
 .cmp-lista li span {
   font-size: 0.85rem;
   color: #52606d;
-}
-
-@media (max-width: 800px) {
-  .cmp-agregar .campo select {
-    min-width: 240px;
-  }
 }

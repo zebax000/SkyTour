@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 
 import { desempenoApi } from "../api/desempeno";
@@ -25,6 +25,7 @@ import "./comparador.css";
 
 const MINIMO = 2;
 const MAXIMO = 4;
+const MAX_RESULTADOS = 8; // el buscador muestra pocos a la vez; para ver otros se escribe más
 const ESCALA_MAXIMA = 5; // las evaluaciones van de 1 a 5
 const ESTADOS_DOC: EstadoDocumento[] = ["vigente", "por_vencer", "vencido"];
 
@@ -61,6 +62,15 @@ function leerIds(texto: string | null): number[] {
     if (Number.isInteger(n) && n > 0 && !ids.includes(n)) ids.push(n);
   }
   return ids.slice(0, MAXIMO);
+}
+
+// Sin tildes ni mayúsculas, para que "cancún" y "CANCUN" encuentren lo mismo
+function normalizar(texto: string): string {
+  return texto
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
 }
 
 // Marca el mejor valor solo si hay al menos dos y no son todos iguales
@@ -136,7 +146,9 @@ export function ComparadorPage() {
   const [opciones, setOpciones] = useState<FilaRanking[] | null>(null);
   const [errorOpciones, setErrorOpciones] = useState(false);
   const [extras, setExtras] = useState<Record<number, Extra>>({});
-  const [elegido, setElegido] = useState("");
+  const [busqueda, setBusqueda] = useState("");
+  const [abierto, setAbierto] = useState(false);
+  const [activo, setActivo] = useState(0);
   const pedidos = useRef(new Set<number>());
 
   useEffect(() => {
@@ -179,11 +191,11 @@ export function ComparadorPage() {
     setParams(nuevos.length > 0 ? { ids: nuevos.join(",") } : {}, { replace: true });
   }
 
-  function agregar() {
-    const id = Number(elegido);
-    if (!id || ids.includes(id) || ids.length >= MAXIMO) return;
+  function agregar(id: number) {
+    if (ids.includes(id) || ids.length >= MAXIMO) return;
     cambiarIds([...ids, id]);
-    setElegido("");
+    setBusqueda("");
+    setActivo(0);
   }
 
   const columnas: Columna[] = ids.map((id) => {
@@ -228,10 +240,45 @@ export function ComparadorPage() {
   });
 
   const disponibles = (opciones ?? []).filter((f) => !ids.includes(f.id));
+  const palabras = normalizar(busqueda).split(/\s+/).filter(Boolean);
+  const coincidencias = disponibles.filter((f) => {
+    const texto = normalizar(`${f.nombre} ${ETIQUETA_TIPO[f.tipo]} ${f.ciudad}`);
+    return palabras.every((p) => texto.includes(p));
+  });
+  const resultados = coincidencias.slice(0, MAX_RESULTADOS);
+  const indiceActivo = Math.min(activo, Math.max(resultados.length - 1, 0));
+
   const lleno = ids.length >= MAXIMO;
   const listo = columnas.length >= MINIMO;
   const mejoresCalificacion = marcarMejores(columnas.map((c) => c.calificacion), true);
   const mejoresIncidentes = marcarMejores(columnas.map((c) => c.incidentes), false);
+
+  function alTeclear(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setAbierto(true);
+      setActivo(Math.min(indiceActivo + 1, resultados.length - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActivo(Math.max(indiceActivo - 1, 0));
+    } else if (e.key === "Enter") {
+      if (abierto && resultados[indiceActivo]) {
+        e.preventDefault();
+        agregar(resultados[indiceActivo].id);
+      }
+    } else if (e.key === "Escape") {
+      setAbierto(false);
+    }
+  }
+
+  let pie: string;
+  if (coincidencias.length > resultados.length) {
+    pie = `Mostrando ${resultados.length} de ${coincidencias.length}. Escribe más para afinar.`;
+  } else if (palabras.length === 0) {
+    pie = `${disponibles.length} proveedores disponibles. Escribe para buscar.`;
+  } else {
+    pie = `${coincidencias.length} ${coincidencias.length === 1 ? "resultado" : "resultados"}.`;
+  }
 
   return (
     <section className="cmp">
@@ -268,20 +315,72 @@ export function ComparadorPage() {
         )}
 
         <div className="cmp-agregar">
-          <label className="campo">
-            Agregar proveedor
-            <select value={elegido} disabled={lleno || opciones === null} onChange={(e) => setElegido(e.target.value)}>
-              <option value="">{lleno ? `Máximo ${MAXIMO} proveedores` : "Elige un proveedor"}</option>
-              {disponibles.map((f) => (
-                <option key={f.id} value={f.id}>
-                  {f.nombre} · {ETIQUETA_TIPO[f.tipo]} · {f.ciudad}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button type="button" className="boton primario" disabled={!elegido || lleno} onClick={agregar}>
-            Agregar
-          </button>
+          <div className="cmp-buscador">
+            <label className="campo">
+              Buscar proveedor por nombre, tipo o ciudad
+              <input
+                type="search"
+                role="combobox"
+                aria-expanded={abierto && !lleno}
+                aria-controls="cmp-resultados"
+                aria-autocomplete="list"
+                aria-activedescendant={abierto && resultados[indiceActivo] ? `cmp-opcion-${resultados[indiceActivo].id}` : undefined}
+                autoComplete="off"
+                value={busqueda}
+                disabled={lleno || opciones === null}
+                placeholder={lleno ? `Máximo ${MAXIMO} proveedores` : "Ej. Aurora, hotel o Cartagena"}
+                onChange={(e) => {
+                  setBusqueda(e.target.value);
+                  setActivo(0);
+                  setAbierto(true);
+                }}
+                onFocus={() => setAbierto(true)}
+                onBlur={() => setAbierto(false)}
+                onKeyDown={alTeclear}
+              />
+            </label>
+
+            {abierto && !lleno && opciones !== null && (
+              <div className="cmp-desplegable">
+                {resultados.length > 0 ? (
+                  <ul id="cmp-resultados" className="cmp-resultados" role="listbox" aria-label="Proveedores disponibles">
+                    {resultados.map((f, i) => (
+                      <li
+                        key={f.id}
+                        id={`cmp-opcion-${f.id}`}
+                        className="cmp-opcion"
+                        role="option"
+                        aria-selected={i === indiceActivo}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          agregar(f.id);
+                        }}
+                        onMouseEnter={() => setActivo(i)}
+                      >
+                        <span className="cmp-opcion-texto">
+                          <span className="cmp-opcion-nombre">{f.nombre}</span>
+                          <span className="cmp-opcion-meta">
+                            {ETIQUETA_TIPO[f.tipo]} · {f.ciudad}
+                          </span>
+                        </span>
+                        {f.calificacion !== null && (
+                          <span className="cmp-opcion-nota">
+                            <span aria-hidden="true">★ </span>
+                            {formatearPuntaje(f.calificacion)}
+                          </span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="cmp-resultados-vacio" role="status">
+                    No hay proveedores con esa búsqueda.
+                  </p>
+                )}
+                <p className="cmp-resultados-pie">{pie}</p>
+              </div>
+            )}
+          </div>
           {ids.length > 0 && (
             <button type="button" className="boton secundario" onClick={() => cambiarIds([])}>
               Limpiar
