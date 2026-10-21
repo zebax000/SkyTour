@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
-from app.api.routers import auth, desempeno, documentos, proveedores, proveedores_quitar, reportes, riesgo
+from app.api.routers import auth, desempeno, documentos, proveedores, proveedores_quitar, reportes, riesgo, usuarios
 from app.core.config import settings
 from app.core.database import engine
 
@@ -17,6 +17,7 @@ app.add_middleware(
 )
 
 app.include_router(auth.router)
+app.include_router(usuarios.router)
 app.include_router(proveedores.router)
 app.include_router(proveedores_quitar.router)
 app.include_router(documentos.router)
