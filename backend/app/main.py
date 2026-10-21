@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
-from app.api.routers import auth, desempeno, documentos, proveedores, proveedores_quitar, riesgo
+from app.api.routers import auth, desempeno, documentos, proveedores, proveedores_quitar, reportes, riesgo
 from app.core.config import settings
 from app.core.database import engine
 
@@ -22,6 +22,7 @@ app.include_router(proveedores_quitar.router)
 app.include_router(documentos.router)
 app.include_router(desempeno.router)
 app.include_router(riesgo.router)
+app.include_router(reportes.router)
 
 
 @app.get("/health")
