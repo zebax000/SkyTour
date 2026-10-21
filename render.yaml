@@ -1,0 +1,33 @@
+# Despliegue del backend en Render (Blueprint).
+# El frontend se publica aparte en Vercel; la guía completa está en docs/Despliegue.md.
+services:
+  - type: web
+    name: skytour-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    # Aplica las migraciones y arranca la API. Render entrega el puerto en $PORT.
+    startCommand: alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      # Fija la versión de Python: sin esto Render usa la más reciente, que puede no coincidir con la tuya.
+      # Cámbiala por la versión con la que desarrollas.
+      - key: PYTHON_VERSION
+        value: 3.13.5
+      # Cadena de conexión de Neon. Se escribe en el panel de Render, nunca aquí.
+      - key: DATABASE_URL
+        sync: false
+      # Render genera una clave aleatoria la primera vez.
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "60"
+      # Dirección exacta del frontend en Vercel, sin barra final (por ejemplo https://skytour.vercel.app).
+      - key: FRONTEND_URL
+        sync: false
+      # Opcional: sin clave, la explicación del riesgo usa solo reglas.
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.5-flash-lite
