@@ -3,7 +3,7 @@
 Es seguro repetirlo: no duplica nada de lo que ya existe.
 La contraseña de los tres usuarios sale de SEED_PASSWORD en el .env.
 """
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -158,7 +158,7 @@ def _fecha(dias: int) -> date:
 
 
 def _hace(dias: int) -> datetime:
-    return datetime.now(timezone.utc) - timedelta(days=dias)
+    return datetime.now(UTC) - timedelta(days=dias)
 
 
 def _parametros(db: Session) -> None:

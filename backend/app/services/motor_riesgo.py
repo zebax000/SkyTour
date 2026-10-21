@@ -1,9 +1,11 @@
 from dataclasses import dataclass
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import ROUND_HALF_UP, Decimal
 
 from app.core.constantes import (
-    DIAS_POR_VENCER, DIAS_VENTANA_RIESGO,
-    UMBRAL_RIESGO_BAJO_MAX, UMBRAL_RIESGO_MEDIO_MAX,
+    DIAS_POR_VENCER,
+    DIAS_VENTANA_RIESGO,
+    UMBRAL_RIESGO_BAJO_MAX,
+    UMBRAL_RIESGO_MEDIO_MAX,
 )
 
 MAXIMOS = {"documentacion": 30, "calificacion": 25, "incidentes": 20, "incumplimientos": 15, "tarifas": 10}
@@ -52,6 +54,6 @@ def calcular_riesgo(documentos_dias, promedio, eventos, servicios_sin_tarifa, ma
         "incumplimientos": sum((Decimal(5) * (Decimal("0.5") if e.resuelto else 1) for e in recientes if e.tipo == "incumplimiento"), Decimal(0)),
         "tarifas": Decimal(5 * servicios_sin_tarifa),
     }
-    factores = {k: min(limites[k], int(v.quantize(Decimal("1"), rounding=ROUND_HALF_UP))) for k, v in puntos.items()}
+    factores = {k: min(limites[k], int(v.quantize(Decimal(1), rounding=ROUND_HALF_UP))) for k, v in puntos.items()}
     total = sum(factores.values())
     return {"puntaje": total, "nivel": nivel_de_puntaje(total), "factores": factores}

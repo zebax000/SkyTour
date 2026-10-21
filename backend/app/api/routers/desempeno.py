@@ -1,5 +1,4 @@
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import func, or_, select
@@ -35,7 +34,12 @@ from app.schemas.desempeno import (
 )
 from app.schemas.proveedor import ProveedorResumen
 from app.services.calificacion import promedio_ultimas, suma_criterios
-from app.services.riesgo_lista import asegurar_analisis, con_nivel, motivos_de_atencion, riesgo_de
+from app.services.riesgo_lista import (
+    asegurar_analisis,
+    con_nivel,
+    motivos_de_atencion,
+    riesgo_de,
+)
 
 # Evaluaciones, incidentes y observaciones. Registrar: administrador y evaluador. Consultar: cualquier usuario con sesión.
 # El riesgo del proveedor se recalcula solo al confirmar estos cambios (services/recalculo_automatico.py).
@@ -55,7 +59,7 @@ def _verificar_proveedor(db: Session, proveedor_id: int) -> None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Proveedor no encontrado.")
 
 
-def _filtro_proveedor(q: Optional[str]):
+def _filtro_proveedor(q: str | None):
     if q and q.strip():
         return Proveedor.nombre.ilike(f"%{_escapar_like(q.strip())}%", escape="\\")
     return None
@@ -115,7 +119,7 @@ def evaluar(
 
 @router.get("/evaluaciones", response_model=PaginaEvaluaciones, dependencies=[Depends(get_current_user)])
 def listar_evaluaciones(
-    q: Optional[str] = Query(None, description="Busca por proveedor"),
+    q: str | None = Query(None, description="Busca por proveedor"),
     pagina: int = Query(1, ge=1),
     tamano: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db),
@@ -196,7 +200,7 @@ def resolver_incidente(
     if incidente.resuelto:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="El incidente ya está resuelto.")
     incidente.resuelto = True
-    incidente.fecha_cierre = datetime.now(timezone.utc)
+    incidente.fecha_cierre = datetime.now(UTC)
     incidente.comentario_cierre = datos.comentario
     db.commit()
     nombre = db.scalar(select(Usuario.nombre).where(Usuario.id == incidente.registrado_por)) or ""
@@ -205,10 +209,10 @@ def resolver_incidente(
 
 @router.get("/incidentes", response_model=PaginaIncidentes, dependencies=[Depends(get_current_user)])
 def listar_incidentes(
-    tipo: Optional[TipoIncidente] = None,
-    gravedad: Optional[Gravedad] = None,
-    resuelto: Optional[bool] = None,
-    q: Optional[str] = Query(None, description="Busca por proveedor"),
+    tipo: TipoIncidente | None = None,
+    gravedad: Gravedad | None = None,
+    resuelto: bool | None = None,
+    q: str | None = Query(None, description="Busca por proveedor"),
     pagina: int = Query(1, ge=1),
     tamano: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db),

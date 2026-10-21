@@ -9,7 +9,13 @@ from app.api.deps import get_current_user
 from app.core.database import get_db
 from app.main import app
 from app.models import Rol
-from app.schemas.desempeno import CierreIn, EvaluacionIn, EvaluacionOut, IncidenteIn, ObservacionIn
+from app.schemas.desempeno import (
+    CierreIn,
+    EvaluacionIn,
+    EvaluacionOut,
+    IncidenteIn,
+    ObservacionIn,
+)
 
 
 # ---------- Validación de datos ----------

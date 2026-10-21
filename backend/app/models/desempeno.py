@@ -1,7 +1,15 @@
 from datetime import datetime
-from typing import Optional
 
-from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Index, SmallInteger, Text, func, text
+from sqlalchemy import (
+    CheckConstraint,
+    DateTime,
+    ForeignKey,
+    Index,
+    SmallInteger,
+    Text,
+    func,
+    text,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
@@ -18,7 +26,7 @@ class Evaluacion(Base):
     puntualidad: Mapped[int] = mapped_column(SmallInteger)
     cumplimiento: Mapped[int] = mapped_column(SmallInteger)
     precio: Mapped[int] = mapped_column(SmallInteger)
-    comentario: Mapped[Optional[str]] = mapped_column(Text)
+    comentario: Mapped[str | None] = mapped_column(Text)
     fecha: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     __table_args__ = (
@@ -42,8 +50,8 @@ class Incidente(Base):
     descripcion: Mapped[str] = mapped_column(Text)
     fecha: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     resuelto: Mapped[bool] = mapped_column(default=False, server_default=text("false"))
-    fecha_cierre: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
-    comentario_cierre: Mapped[Optional[str]] = mapped_column(Text)
+    fecha_cierre: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    comentario_cierre: Mapped[str | None] = mapped_column(Text)
 
     __table_args__ = (
         Index("ix_incidente_proveedor_fecha", "proveedor_id", "fecha"),

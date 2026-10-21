@@ -1,6 +1,6 @@
 from datetime import date, datetime
 from decimal import Decimal
-from typing import Annotated, Optional
+from typing import Annotated
 
 from pydantic import (
     BaseModel,
@@ -30,7 +30,7 @@ class TarifaIn(BaseModel):
     valor: Decimal = Field(ge=0, max_digits=14, decimal_places=2)
     moneda: Moneda = Moneda.COP
     vigente_desde: date
-    vigente_hasta: Optional[date] = None
+    vigente_hasta: date | None = None
 
     @model_validator(mode="after")
     def _vigencia_coherente(self):
@@ -41,7 +41,7 @@ class TarifaIn(BaseModel):
 
 class ServicioIn(BaseModel):
     nombre: Nombre
-    descripcion: Optional[str] = None
+    descripcion: str | None = None
     tarifas: list[TarifaIn] = []
 
 
@@ -65,9 +65,9 @@ class ProveedorIn(BaseModel):
     nit: Nit
     tipo: TipoProveedor
     ciudad: Ciudad
-    contacto_nombre: Optional[Contacto] = None
-    contacto_correo: Optional[CorreoContacto] = None
-    contacto_telefono: Optional[Telefono] = None
+    contacto_nombre: Contacto | None = None
+    contacto_correo: CorreoContacto | None = None
+    contacto_telefono: Telefono | None = None
     servicios: list[ServicioIn] = []
     zonas: list[Zona] = []
 
@@ -80,13 +80,13 @@ class ProveedorIn(BaseModel):
 class ProveedorUpdate(BaseModel):
     """Solo se cambian los campos que se envían. El estado se cambia en su propia ruta."""
 
-    nombre: Optional[Nombre] = None
-    nit: Optional[Nit] = None
-    tipo: Optional[TipoProveedor] = None
-    ciudad: Optional[Ciudad] = None
-    contacto_nombre: Optional[Contacto] = None
-    contacto_correo: Optional[CorreoContacto] = None
-    contacto_telefono: Optional[Telefono] = None
+    nombre: Nombre | None = None
+    nit: Nit | None = None
+    tipo: TipoProveedor | None = None
+    ciudad: Ciudad | None = None
+    contacto_nombre: Contacto | None = None
+    contacto_correo: CorreoContacto | None = None
+    contacto_telefono: Telefono | None = None
 
     @field_validator("nombre", "nit", "tipo", "ciudad")
     @classmethod
@@ -108,7 +108,7 @@ class TarifaOut(BaseModel):
     valor: Decimal
     moneda: Moneda
     vigente_desde: date
-    vigente_hasta: Optional[date]
+    vigente_hasta: date | None
 
     @computed_field  # type: ignore[prop-decorator]
     @property
@@ -121,7 +121,7 @@ class ServicioOut(BaseModel):
 
     id: int
     nombre: str
-    descripcion: Optional[str]
+    descripcion: str | None
     tarifas: list[TarifaOut]
 
 
@@ -146,14 +146,14 @@ class ProveedorResumen(BaseModel):
 class ProveedorConRiesgo(ProveedorResumen):
     """Resumen con el último riesgo guardado. Es nulo mientras no se haya calculado."""
 
-    riesgo_nivel: Optional[NivelRiesgo] = None
-    riesgo_puntaje: Optional[int] = None
+    riesgo_nivel: NivelRiesgo | None = None
+    riesgo_puntaje: int | None = None
 
 
 class ProveedorDetalle(ProveedorResumen):
-    contacto_nombre: Optional[str]
-    contacto_correo: Optional[str]
-    contacto_telefono: Optional[str]
+    contacto_nombre: str | None
+    contacto_correo: str | None
+    contacto_telefono: str | None
     creado_en: datetime
     servicios: list[ServicioOut]
     zonas: list[ZonaOut]

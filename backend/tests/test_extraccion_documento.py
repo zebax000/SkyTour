@@ -3,9 +3,9 @@ import json
 import logging
 from types import SimpleNamespace
 
-import google.genai as genai
 import pytest
 from fastapi.testclient import TestClient
+from google import genai
 
 from app.api.deps import get_current_user
 from app.api.routers import documentos as ruta_documentos

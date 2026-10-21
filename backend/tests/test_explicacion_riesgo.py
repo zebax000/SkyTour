@@ -2,8 +2,8 @@ import json
 import logging
 from types import SimpleNamespace
 
-import google.genai as genai
 import pytest
+from google import genai
 
 from app.services import explicacion_riesgo as m
 

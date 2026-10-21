@@ -7,7 +7,12 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_current_user
 from app.core.config import settings
 from app.core.database import get_db
-from app.core.security import HASH_FALSO, create_access_token, hash_password, verify_password
+from app.core.security import (
+    HASH_FALSO,
+    create_access_token,
+    hash_password,
+    verify_password,
+)
 from app.models import Usuario
 from app.schemas.auth import LoginIn, TokenOut, UsuarioOut
 from app.schemas.usuario import CambioContrasena

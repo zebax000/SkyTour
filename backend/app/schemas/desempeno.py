@@ -1,7 +1,14 @@
 from datetime import datetime
-from typing import Annotated, Optional
+from typing import Annotated
 
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints, computed_field, field_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    StringConstraints,
+    computed_field,
+    field_validator,
+)
 
 from app.models.enums import Gravedad, TipoIncidente
 from app.schemas.proveedor import ProveedorConRiesgo
@@ -17,7 +24,7 @@ class EvaluacionIn(BaseModel):
     puntualidad: Calificacion
     cumplimiento: Calificacion
     precio: Calificacion
-    comentario: Optional[Texto] = None
+    comentario: Texto | None = None
 
     @field_validator("comentario", mode="before")
     @classmethod
@@ -34,7 +41,7 @@ class IncidenteIn(BaseModel):
 
 
 class CierreIn(BaseModel):
-    comentario: Optional[Texto] = None
+    comentario: Texto | None = None
 
     @field_validator("comentario", mode="before")
     @classmethod
@@ -60,7 +67,7 @@ class EvaluacionOut(BaseModel):
     puntualidad: int
     cumplimiento: int
     precio: int
-    comentario: Optional[str]
+    comentario: str | None
     fecha: datetime
 
     @computed_field  # type: ignore[prop-decorator]
@@ -74,7 +81,7 @@ class EvaluacionConProveedor(EvaluacionOut):
 
 
 class EvaluacionesDeProveedor(BaseModel):
-    promedio: Optional[float]  # de las últimas 5; None si no hay evaluaciones
+    promedio: float | None  # de las últimas 5; None si no hay evaluaciones
     en_promedio: int  # cuántas evaluaciones entraron en ese promedio
     total: int
     items: list[EvaluacionOut]
@@ -99,8 +106,8 @@ class IncidenteOut(BaseModel):
     descripcion: str
     fecha: datetime
     resuelto: bool
-    fecha_cierre: Optional[datetime]
-    comentario_cierre: Optional[str]
+    fecha_cierre: datetime | None
+    comentario_cierre: str | None
 
 
 class IncidenteConProveedor(IncidenteOut):

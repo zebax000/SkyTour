@@ -1,7 +1,6 @@
 import base64
 import binascii
 from dataclasses import dataclass
-from typing import Optional
 
 from app.core.constantes import ARCHIVO_MAX_MB
 
@@ -27,7 +26,7 @@ class ArchivoLeido:
     datos: bytes
 
 
-def detectar_tipo(datos: bytes) -> Optional[str]:
+def detectar_tipo(datos: bytes) -> str | None:
     for firma, tipo in _FIRMAS:
         if datos.startswith(firma):
             return tipo

@@ -1,7 +1,7 @@
 from sqlalchemy import event, select
 
 from app.core.database import SessionLocal
-from app.models import Proveedor, Documento, Evaluacion, Incidente, Servicio, Tarifa
+from app.models import Documento, Evaluacion, Incidente, Proveedor, Servicio, Tarifa
 from app.services.riesgo_proveedor import calcular_para_proveedor, guardar_resultado
 
 DEPENDIENTES = (Documento, Evaluacion, Incidente, Servicio)

@@ -1,5 +1,5 @@
-from datetime import datetime, timedelta, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime, timedelta
+from typing import Any
 
 import jwt
 from pwdlib import PasswordHash
@@ -30,10 +30,10 @@ def _clave() -> str:
     return settings.secret_key
 
 
-def create_access_token(user_id: int, rol: str, expires_minutes: Optional[int] = None) -> str:
+def create_access_token(user_id: int, rol: str, expires_minutes: int | None = None) -> str:
     """Crea un JWT firmado. Solo lleva datos no sensibles: id, rol (para la interfaz), emisión y vencimiento."""
     minutos = settings.access_token_expire_minutes if expires_minutes is None else expires_minutes
-    ahora = datetime.now(timezone.utc)
+    ahora = datetime.now(UTC)
     payload: dict[str, Any] = {
         "sub": str(user_id),
         "rol": rol,

@@ -1,4 +1,3 @@
-from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy import func, or_, select
@@ -42,8 +41,8 @@ def _o_404(db: Session, usuario_id: int) -> Usuario:
 @router.get("", response_model=PaginaUsuarios)
 def listar(
     q: str = Query("", max_length=100),
-    rol: Optional[Rol] = None,
-    activo: Optional[bool] = None,
+    rol: Rol | None = None,
+    activo: bool | None = None,
     pagina: int = Query(1, ge=1),
     tamano: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db),

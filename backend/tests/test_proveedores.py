@@ -40,18 +40,18 @@ def test_consultor_no_cambia_estados():
 
 # ---------- Validación de datos ----------
 def test_tarifa_valida():
-    t = TarifaIn(valor=Decimal("120000"), vigente_desde=date(2026, 1, 1), vigente_hasta=date(2026, 12, 31))
+    t = TarifaIn(valor=Decimal(120000), vigente_desde=date(2026, 1, 1), vigente_hasta=date(2026, 12, 31))
     assert t.moneda.value == "COP"
 
 
 def test_tarifa_negativa_se_rechaza():
     with pytest.raises(ValidationError):
-        TarifaIn(valor=Decimal("-1"), vigente_desde=date(2026, 1, 1))
+        TarifaIn(valor=Decimal(-1), vigente_desde=date(2026, 1, 1))
 
 
 def test_tarifa_con_vigencia_al_reves_se_rechaza():
     with pytest.raises(ValidationError):
-        TarifaIn(valor=Decimal("10"), vigente_desde=date(2026, 5, 1), vigente_hasta=date(2026, 4, 1))
+        TarifaIn(valor=Decimal(10), vigente_desde=date(2026, 5, 1), vigente_hasta=date(2026, 4, 1))
 
 
 def test_zonas_repetidas_se_limpian():

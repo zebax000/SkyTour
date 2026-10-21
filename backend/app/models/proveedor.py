@@ -1,6 +1,5 @@
 from datetime import date, datetime
 from decimal import Decimal
-from typing import Optional
 
 from sqlalchemy import (
     CheckConstraint,
@@ -28,9 +27,9 @@ class Proveedor(Base):
     nombre: Mapped[str] = mapped_column(String(150))
     nit: Mapped[str] = mapped_column(String(30))
     tipo: Mapped[TipoProveedor] = mapped_column(pg_enum(TipoProveedor, "tipo_proveedor"))
-    contacto_nombre: Mapped[Optional[str]] = mapped_column(String(120))
-    contacto_correo: Mapped[Optional[str]] = mapped_column(String(255))
-    contacto_telefono: Mapped[Optional[str]] = mapped_column(String(30))
+    contacto_nombre: Mapped[str | None] = mapped_column(String(120))
+    contacto_correo: Mapped[str | None] = mapped_column(String(255))
+    contacto_telefono: Mapped[str | None] = mapped_column(String(30))
     ciudad: Mapped[str] = mapped_column(String(100))
     estado: Mapped[EstadoProveedor] = mapped_column(
         pg_enum(EstadoProveedor, "estado_proveedor"),
@@ -62,7 +61,7 @@ class Servicio(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     proveedor_id: Mapped[int] = mapped_column(ForeignKey("proveedor.id", ondelete="CASCADE"), index=True)
     nombre: Mapped[str] = mapped_column(String(150))
-    descripcion: Mapped[Optional[str]] = mapped_column(Text)
+    descripcion: Mapped[str | None] = mapped_column(Text)
 
     tarifas: Mapped[list["Tarifa"]] = relationship(cascade="all, delete-orphan", passive_deletes=True)
 
@@ -77,7 +76,7 @@ class Tarifa(Base):
         pg_enum(Moneda, "moneda"), default=Moneda.COP, server_default=text("'COP'")
     )
     vigente_desde: Mapped[date] = mapped_column(Date)
-    vigente_hasta: Mapped[Optional[date]] = mapped_column(Date)
+    vigente_hasta: Mapped[date | None] = mapped_column(Date)
 
     __table_args__ = (
         CheckConstraint("valor >= 0", name="tarifa_valor_positivo"),

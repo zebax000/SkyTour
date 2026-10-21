@@ -1,8 +1,18 @@
 import pytest
 from pydantic import ValidationError
 
-from app.schemas.usuario import CambioContrasena, ContrasenaNueva, UsuarioActualizar, UsuarioCrear
-from app.services.usuarios import ReglaUsuario, validar_cambio, validar_contrasena, validar_correo
+from app.schemas.usuario import (
+    CambioContrasena,
+    ContrasenaNueva,
+    UsuarioActualizar,
+    UsuarioCrear,
+)
+from app.services.usuarios import (
+    ReglaUsuario,
+    validar_cambio,
+    validar_contrasena,
+    validar_correo,
+)
 
 ADMIN, EVAL = "administrador", "evaluador"
 

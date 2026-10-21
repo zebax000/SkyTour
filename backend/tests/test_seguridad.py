@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from types import SimpleNamespace
 
 import jwt
@@ -45,7 +45,7 @@ def test_token_alterado_se_rechaza():
 
 
 def test_token_firmado_con_otra_clave_se_rechaza():
-    ahora = datetime.now(timezone.utc)
+    ahora = datetime.now(UTC)
     falso = jwt.encode(
         {"sub": "1", "exp": ahora + timedelta(minutes=5)}, "otra-clave-distinta-" * 4, algorithm=ALGORITMO
     )
@@ -54,7 +54,7 @@ def test_token_firmado_con_otra_clave_se_rechaza():
 
 
 def test_token_con_otro_algoritmo_se_rechaza():
-    ahora = datetime.now(timezone.utc)
+    ahora = datetime.now(UTC)
     otro = jwt.encode({"sub": "1", "exp": ahora + timedelta(minutes=5)}, settings.secret_key, algorithm="HS512")
     with pytest.raises(jwt.InvalidTokenError):
         decode_access_token(otro)

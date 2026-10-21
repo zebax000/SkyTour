@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -64,9 +63,9 @@ class UsuarioCrear(BaseModel):
 class UsuarioActualizar(BaseModel):
     """Solo cambia lo que se envía. Un valor nulo explícito no se acepta."""
 
-    nombre: Optional[str] = Field(default=None, max_length=120)
-    rol: Optional[Rol] = None
-    activo: Optional[bool] = None
+    nombre: str | None = Field(default=None, max_length=120)
+    rol: Rol | None = None
+    activo: bool | None = None
 
     @field_validator("nombre", "rol", "activo")
     @classmethod

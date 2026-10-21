@@ -1,5 +1,4 @@
 from datetime import date, datetime
-from typing import Optional
 from zoneinfo import ZoneInfo
 
 from app.core.constantes import DIAS_POR_VENCER, ZONA_HORARIA
@@ -10,7 +9,7 @@ def hoy() -> date:
     return datetime.now(ZoneInfo(ZONA_HORARIA)).date()
 
 
-def estado_tarifa(vigente_desde: date, vigente_hasta: Optional[date], fecha: Optional[date] = None) -> str:
+def estado_tarifa(vigente_desde: date, vigente_hasta: date | None, fecha: date | None = None) -> str:
     """'futura', 'vigente' o 'vencida'. Sin fecha final, la tarifa sigue vigente."""
     fecha = fecha or hoy()
     if vigente_desde > fecha:
@@ -20,7 +19,7 @@ def estado_tarifa(vigente_desde: date, vigente_hasta: Optional[date], fecha: Opt
     return "vigente"
 
 
-def estado_documento(fecha_vencimiento: date, fecha: Optional[date] = None) -> str:
+def estado_documento(fecha_vencimiento: date, fecha: date | None = None) -> str:
     """'vigente' (más de 30 días), 'por_vencer' (30 días o menos) o 'vencido' (la fecha ya pasó)."""
     fecha = fecha or hoy()
     dias = (fecha_vencimiento - fecha).days

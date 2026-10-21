@@ -1,4 +1,3 @@
-from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy import func, or_, select
@@ -57,7 +56,7 @@ def _cargar(db: Session, proveedor_id: int) -> Proveedor:
     return proveedor
 
 
-def _nit_en_uso(db: Session, nit: str, excepto_id: Optional[int] = None) -> bool:
+def _nit_en_uso(db: Session, nit: str, excepto_id: int | None = None) -> bool:
     consulta = select(Proveedor.id).where(Proveedor.nit == nit)
     if excepto_id is not None:
         consulta = consulta.where(Proveedor.id != excepto_id)
@@ -74,11 +73,11 @@ def _confirmar(db: Session) -> None:
 
 @router.get("", response_model=PaginaProveedores, dependencies=[Depends(get_current_user)])
 def listar(
-    q: Optional[str] = Query(None, description="Busca por nombre o NIT"),
-    tipo: Optional[TipoProveedor] = None,
-    ciudad: Optional[str] = None,
-    estado: Optional[EstadoProveedor] = None,
-    riesgo: Optional[NivelRiesgo] = None,
+    q: str | None = Query(None, description="Busca por nombre o NIT"),
+    tipo: TipoProveedor | None = None,
+    ciudad: str | None = None,
+    estado: EstadoProveedor | None = None,
+    riesgo: NivelRiesgo | None = None,
     pagina: int = Query(1, ge=1),
     tamano: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db),

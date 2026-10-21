@@ -1,4 +1,3 @@
-from typing import Optional
 
 from pydantic import BaseModel
 
@@ -12,8 +11,8 @@ class FilaRanking(BaseModel):
     tipo: TipoProveedor
     ciudad: str
     estado: EstadoProveedor
-    calificacion: Optional[float] = None
+    calificacion: float | None = None
     evaluaciones: int
-    riesgo_nivel: Optional[NivelRiesgo] = None
-    riesgo_puntaje: Optional[int] = None
+    riesgo_nivel: NivelRiesgo | None = None
+    riesgo_puntaje: int | None = None
     incidentes_abiertos: int

@@ -1,4 +1,4 @@
-from typing import Literal, Optional
+from typing import Literal
 
 from fastapi import APIRouter, Depends, Response
 from sqlalchemy.orm import Session
@@ -45,8 +45,8 @@ def _subtitulo(tipo, ciudad):
 @router.get('/ranking', response_model=list[FilaRanking], dependencies=[Depends(get_current_user)])
 def ranking(
     orden: Orden = 'calificacion',
-    tipo: Optional[TipoProveedor] = None,
-    ciudad: Optional[str] = None,
+    tipo: TipoProveedor | None = None,
+    ciudad: str | None = None,
     db: Session = Depends(get_db),
 ):
     return construir_ranking(db, orden, tipo, ciudad)
@@ -55,8 +55,8 @@ def ranking(
 @router.get('/ranking.csv', dependencies=[Depends(get_current_user)])
 def ranking_csv(
     orden: Orden = 'calificacion',
-    tipo: Optional[TipoProveedor] = None,
-    ciudad: Optional[str] = None,
+    tipo: TipoProveedor | None = None,
+    ciudad: str | None = None,
     db: Session = Depends(get_db),
 ):
     filas = a_filas_legibles(construir_ranking(db, orden, tipo, ciudad))
@@ -66,8 +66,8 @@ def ranking_csv(
 @router.get('/ranking.pdf', dependencies=[Depends(get_current_user)])
 def ranking_pdf(
     orden: Orden = 'calificacion',
-    tipo: Optional[TipoProveedor] = None,
-    ciudad: Optional[str] = None,
+    tipo: TipoProveedor | None = None,
+    ciudad: str | None = None,
     db: Session = Depends(get_db),
 ):
     filas = a_filas_legibles(construir_ranking(db, orden, tipo, ciudad))

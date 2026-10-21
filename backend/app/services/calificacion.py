@@ -1,5 +1,5 @@
+from collections.abc import Sequence
 from decimal import ROUND_HALF_UP, Decimal
-from typing import Optional, Sequence
 
 from app.core.constantes import EVALUACIONES_PARA_PROMEDIO
 
@@ -19,7 +19,7 @@ def promedio_evaluacion(calidad: int, puntualidad: int, cumplimiento: int, preci
     return _redondear(Decimal(suma_criterios(calidad, puntualidad, cumplimiento, precio)) / CRITERIOS)
 
 
-def promedio_ultimas(sumas_recientes_primero: Sequence[int], cantidad: int = EVALUACIONES_PARA_PROMEDIO) -> Optional[float]:
+def promedio_ultimas(sumas_recientes_primero: Sequence[int], cantidad: int = EVALUACIONES_PARA_PROMEDIO) -> float | None:
     """Calificación del proveedor: promedio de sus últimas evaluaciones (5 por defecto).
 
     Recibe la suma de los cuatro criterios de cada evaluación, de la más reciente a la más antigua.

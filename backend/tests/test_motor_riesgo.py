@@ -1,5 +1,7 @@
 import pytest
+
 from app.services.motor_riesgo import EventoRiesgo, calcular_riesgo, nivel_de_puntaje
+
 
 @pytest.mark.parametrize('puntaje,nivel', [(0,'bajo'),(33,'bajo'),(34,'medio'),(66,'medio'),(67,'alto'),(100,'alto')])
 def test_umbrales(puntaje, nivel):

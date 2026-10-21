@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional
 
 from sqlalchemy import (
     CheckConstraint,
@@ -24,7 +23,7 @@ class AnalisisRiesgo(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     proveedor_id: Mapped[int] = mapped_column(ForeignKey("proveedor.id", ondelete="CASCADE"))
-    puntaje: Mapped[Optional[int]] = mapped_column(SmallInteger)  # nulo si no hay datos suficientes
+    puntaje: Mapped[int | None] = mapped_column(SmallInteger)  # nulo si no hay datos suficientes
     nivel: Mapped[NivelRiesgo] = mapped_column(pg_enum(NivelRiesgo, "nivel_riesgo"))
     calculado_en: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
@@ -50,7 +49,7 @@ class AnalisisRiesgoFactor(Base):
     )
     factor: Mapped[FactorRiesgo] = mapped_column(pg_enum(FactorRiesgo, "factor_riesgo"))
     puntos: Mapped[int] = mapped_column(SmallInteger)
-    descripcion: Mapped[Optional[str]] = mapped_column(String(255))
+    descripcion: Mapped[str | None] = mapped_column(String(255))
 
 
 class ParametroRiesgo(Base):

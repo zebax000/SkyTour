@@ -1,7 +1,17 @@
 from datetime import date, datetime
 from typing import Optional
 
-from sqlalchemy import CheckConstraint, Date, DateTime, ForeignKey, Index, Integer, LargeBinary, String, func
+from sqlalchemy import (
+    CheckConstraint,
+    Date,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    LargeBinary,
+    String,
+    func,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -16,7 +26,7 @@ class Documento(Base):
     fecha_emision: Mapped[date] = mapped_column(Date)
     # El estado (vigente, por vencer, vencido) se calcula con esta fecha; no se guarda
     fecha_vencimiento: Mapped[date] = mapped_column(Date)
-    archivo_url: Mapped[Optional[str]] = mapped_column(String(500))  # sin uso: los archivos van en documento_archivo
+    archivo_url: Mapped[str | None] = mapped_column(String(500))  # sin uso: los archivos van en documento_archivo
     creado_en: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     archivo: Mapped[Optional["DocumentoArchivo"]] = relationship(

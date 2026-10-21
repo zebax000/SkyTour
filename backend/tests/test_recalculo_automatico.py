@@ -1,6 +1,14 @@
 import pytest
 
-from app.models import AnalisisRiesgo, Documento, Evaluacion, Incidente, Proveedor, Servicio, Tarifa
+from app.models import (
+    AnalisisRiesgo,
+    Documento,
+    Evaluacion,
+    Incidente,
+    Proveedor,
+    Servicio,
+    Tarifa,
+)
 from app.services import recalculo_automatico as ra
 
 

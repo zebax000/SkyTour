@@ -1,13 +1,22 @@
 from zoneinfo import ZoneInfo
+
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
 from app.core.constantes import EVALUACIONES_PARA_PROMEDIO, ZONA_HORARIA
 from app.models import (
-    Proveedor, Documento, Evaluacion, Incidente, Servicio,
-    AnalisisRiesgo, AnalisisRiesgoFactor, ParametroRiesgo, FactorRiesgo, NivelRiesgo,
+    AnalisisRiesgo,
+    AnalisisRiesgoFactor,
+    Documento,
+    Evaluacion,
+    FactorRiesgo,
+    Incidente,
+    NivelRiesgo,
+    ParametroRiesgo,
+    Proveedor,
+    Servicio,
 )
-from app.services.motor_riesgo import calcular_riesgo, EventoRiesgo
+from app.services.motor_riesgo import EventoRiesgo, calcular_riesgo
 from app.services.vigencia import hoy
 
 

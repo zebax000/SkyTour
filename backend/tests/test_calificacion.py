@@ -1,6 +1,10 @@
 import pytest
 
-from app.services.calificacion import promedio_evaluacion, promedio_ultimas, suma_criterios
+from app.services.calificacion import (
+    promedio_evaluacion,
+    promedio_ultimas,
+    suma_criterios,
+)
 
 
 def test_suma_de_los_cuatro_criterios():

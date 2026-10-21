@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import Literal, Optional
+from typing import Literal
 from urllib.parse import quote
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
@@ -52,8 +52,8 @@ def _con_proveedor(documento: Documento, nombre_proveedor: str) -> dict:
 
 @router.get("/documentos", response_model=PaginaDocumentos, dependencies=[Depends(get_current_user)])
 def listar(
-    estado: Optional[EstadoDocumento] = None,
-    q: Optional[str] = Query(None, description="Busca por proveedor o tipo de documento"),
+    estado: EstadoDocumento | None = None,
+    q: str | None = Query(None, description="Busca por proveedor o tipo de documento"),
     pagina: int = Query(1, ge=1),
     tamano: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db),

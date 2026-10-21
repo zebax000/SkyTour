@@ -1,5 +1,5 @@
 from datetime import date, datetime
-from typing import Annotated, Optional
+from typing import Annotated
 
 from pydantic import (
     BaseModel,
@@ -38,10 +38,10 @@ class DocumentoIn(BaseModel):
 class DocumentoCambios(BaseModel):
     """Solo se cambia lo que se envía. Si llega un archivo, reemplaza al anterior."""
 
-    tipo: Optional[TipoDocumento] = None
-    fecha_emision: Optional[date] = None
-    fecha_vencimiento: Optional[date] = None
-    archivo: Optional[ArchivoIn] = None
+    tipo: TipoDocumento | None = None
+    fecha_emision: date | None = None
+    fecha_vencimiento: date | None = None
+    archivo: ArchivoIn | None = None
 
     @field_validator("tipo", "fecha_emision", "fecha_vencimiento")
     @classmethod
@@ -75,7 +75,7 @@ class DocumentoOut(BaseModel):
     fecha_emision: date
     fecha_vencimiento: date
     creado_en: datetime
-    archivo: Optional[ArchivoOut]
+    archivo: ArchivoOut | None
 
     @computed_field  # type: ignore[prop-decorator]
     @property
@@ -109,10 +109,10 @@ class ExtraccionOut(BaseModel):
     """Valores propuestos por la IA. Siempre los revisa una persona antes de guardar."""
 
     origen: str  # "gemini" o "ninguno"
-    tipo: Optional[str] = None
-    fecha_emision: Optional[date] = None
-    fecha_vencimiento: Optional[date] = None
-    modelo: Optional[str] = None
-    modelo_solicitado: Optional[str] = None
-    motivo: Optional[str] = None
-    advertencia: Optional[str] = None
+    tipo: str | None = None
+    fecha_emision: date | None = None
+    fecha_vencimiento: date | None = None
+    modelo: str | None = None
+    modelo_solicitado: str | None = None
+    motivo: str | None = None
+    advertencia: str | None = None

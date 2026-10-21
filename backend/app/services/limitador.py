@@ -7,7 +7,7 @@ instancia (el plan gratuito de Render) basta; con varias instancias habría que 
 import math
 import threading
 import time
-from typing import Callable
+from collections.abc import Callable
 
 
 class LimitadorIntentos:

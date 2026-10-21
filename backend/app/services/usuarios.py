@@ -1,6 +1,5 @@
 """Reglas de los usuarios que no dependen de la base de datos (por eso se prueban sin conectarse)."""
 import re
-from typing import Optional
 
 ADMINISTRADOR = "administrador"  # Rol.administrador es un str: se compara por valor
 MINIMO_CONTRASENA = 8
@@ -19,7 +18,7 @@ def validar_correo(texto: str) -> str:
     return correo
 
 
-def validar_contrasena(texto: str) -> Optional[str]:
+def validar_contrasena(texto: str) -> str | None:
     """Devuelve el motivo si la contraseña no sirve, o None si está bien."""
     if len(texto) < MINIMO_CONTRASENA:
         return f"La contraseña debe tener al menos {MINIMO_CONTRASENA} caracteres."
@@ -36,8 +35,8 @@ def validar_cambio(
     objetivo_id: int,
     objetivo_rol: str,
     objetivo_activo: bool,
-    nuevo_rol: Optional[str],
-    nuevo_activo: Optional[bool],
+    nuevo_rol: str | None,
+    nuevo_activo: bool | None,
     admins_activos: int,
 ) -> None:
     """Lanza ReglaUsuario si el cambio dejaría la aplicación sin forma de administrarse."""
