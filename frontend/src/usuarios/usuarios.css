@@ -1,0 +1,110 @@
+/* Usuarios y Mi cuenta: mismo lenguaje visual que el Dashboard (tarjetas blancas, esquinas redondeadas, aire) */
+.usr-panel {
+  margin: 0 0 28px;
+  padding: 28px;
+  background: #fff;
+  border: 1px solid var(--borde);
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(11, 37, 69, 0.04);
+}
+
+.usr-panel h2 {
+  margin: 0 0 20px;
+}
+
+.usr-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px 24px;
+}
+
+.usr-form .campo input,
+.usr-form .campo select {
+  width: 100%;
+  min-width: 0;
+}
+
+.usr-form .ayuda {
+  font-weight: 400;
+}
+
+.usr-ver {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  font-size: 0.9rem;
+}
+
+.usr-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.usr-acciones .boton {
+  margin: 0;
+}
+
+.usr-exito {
+  margin: 0 0 20px;
+  padding: 10px 12px;
+  color: #1d6b3d;
+  background: #e1f4e8;
+  border-left: 4px solid var(--verde);
+  border-radius: 4px;
+}
+
+.usr-botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.usr-rol-administrador {
+  color: var(--azul);
+  background: #f3e9cf;
+}
+
+.usr-rol-evaluador {
+  color: #1d4f7a;
+  background: #e1edf7;
+}
+
+.usr-rol-consultor {
+  color: #3e4c59;
+  background: #e4e7eb;
+}
+
+.usr-cuenta {
+  max-width: 720px;
+}
+
+.usr-datos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px 24px;
+  margin: 0;
+}
+
+.usr-datos dt {
+  font-size: 0.85rem;
+  color: #52606d;
+}
+
+.usr-datos dd {
+  margin: 2px 0 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+/* El nombre de la barra superior lleva a Mi cuenta */
+.enlace-cuenta {
+  color: inherit;
+  text-decoration: none;
+}
+
+.enlace-cuenta:hover {
+  text-decoration: underline;
+}

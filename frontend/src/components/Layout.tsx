@@ -42,7 +42,9 @@ export function Layout() {
       <div className="contenido">
         <header className="barra-superior">
           <div className="usuario">
-            <span className="nombre">{usuario.nombre}</span>
+            <NavLink to="/cuenta" className="nombre enlace-cuenta" title="Mi cuenta y contraseña">
+              {usuario.nombre}
+            </NavLink>
             <span className="insignia-rol">{ETIQUETA_ROL[usuario.rol]}</span>
           </div>
           <button type="button" className="boton secundario" onClick={salir}>

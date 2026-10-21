@@ -13,6 +13,8 @@ Estado: el MVP funciona completo en local. La publicación en línea está expli
 - Riesgo de 0 a 100 (bajo, medio, alto) con explicación de factores
 - Lista de atención, comparador de 2 a 4 proveedores, ranking con descarga en CSV y PDF, y Dashboard
 - Tres roles: administrador, evaluador y consultor
+- Administración de usuarios para el administrador: altas, cambio de rol, desactivación y restablecimiento de contraseña. Cada persona cambia la suya desde Mi cuenta
+- Inicio de sesión protegido: cinco intentos fallidos bloquean el correo durante 15 minutos
 
 ## MVP
 
@@ -61,6 +63,7 @@ uvicorn app.main:app --reload
 
 - `alembic upgrade head` crea las tablas.
 - `python -m app.seed` carga datos ficticios y tres usuarios de demostración (uno por rol) con la contraseña de `SEED_PASSWORD`. Los correos están en `backend/app/seed.py`. No lo ejecutes contra una base con datos reales.
+- Para crear tu propio administrador en una base vacía: `python -m app.crear_admin --nombre "Tu Nombre" --correo tu@correo.com`. Pide la contraseña por teclado.
 - La API queda en http://localhost:8000. Comprueba que responde en http://localhost:8000/health.
 
 ### 3. Frontend

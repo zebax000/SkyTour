@@ -4,19 +4,20 @@ import { Layout } from "./components/Layout";
 import { RequireAuth } from "./components/RequireAuth";
 import { RequireRole } from "./components/RequireRole";
 import { ComparadorPage } from "./pages/ComparadorPage";
+import { CuentaPage } from "./pages/CuentaPage";
 import { DocumentosPage } from "./pages/DocumentosPage";
 import { EvaluacionesPage } from "./pages/EvaluacionesPage";
 import { IncidentesPage } from "./pages/IncidentesPage";
 import { InicioPage } from "./pages/InicioPage";
 import { LoginPage } from "./pages/LoginPage";
 import { NoEncontradaPage } from "./pages/NoEncontradaPage";
-import { PaginaPendiente } from "./pages/PaginaPendiente";
 import { ProveedorEditarPage } from "./pages/ProveedorEditarPage";
 import { ProveedorFichaPage } from "./pages/ProveedorFichaPage";
 import { ProveedorNuevoPage } from "./pages/ProveedorNuevoPage";
 import { ProveedoresPage } from "./pages/ProveedoresPage";
 import { ReportesPage } from "./pages/ReportesPage";
 import { SinPermisoPage } from "./pages/SinPermisoPage";
+import { UsuariosPage } from "./pages/UsuariosPage";
 
 export default function App() {
   return (
@@ -39,13 +40,10 @@ export default function App() {
           <Route path="incidentes" element={<IncidentesPage />} />
           <Route path="reportes" element={<ReportesPage />} />
           <Route path="comparador" element={<ComparadorPage />} />
+          <Route path="cuenta" element={<CuentaPage />} />
 
-          {/* TODO(frontend): cada página pendiente se reemplaza en la fase indicada */}
           <Route element={<RequireRole roles={["administrador"]} />}>
-            <Route
-              path="usuarios"
-              element={<PaginaPendiente titulo="Usuarios" fase="Después del MVP" descripcion="Administración de usuarios desde la interfaz (solo administrador)." />}
-            />
+            <Route path="usuarios" element={<UsuariosPage />} />
           </Route>
 
           <Route path="sin-permiso" element={<SinPermisoPage />} />
