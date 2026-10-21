@@ -14,6 +14,7 @@ import { ProveedorEditarPage } from "./pages/ProveedorEditarPage";
 import { ProveedorFichaPage } from "./pages/ProveedorFichaPage";
 import { ProveedorNuevoPage } from "./pages/ProveedorNuevoPage";
 import { ProveedoresPage } from "./pages/ProveedoresPage";
+import { ReportesPage } from "./pages/ReportesPage";
 import { SinPermisoPage } from "./pages/SinPermisoPage";
 
 export default function App() {
@@ -35,15 +36,12 @@ export default function App() {
           <Route path="documentos" element={<DocumentosPage />} />
           <Route path="evaluaciones" element={<EvaluacionesPage />} />
           <Route path="incidentes" element={<IncidentesPage />} />
+          <Route path="reportes" element={<ReportesPage />} />
 
           {/* TODO(frontend): cada página pendiente se reemplaza en la fase indicada */}
           <Route
             path="comparador"
             element={<PaginaPendiente titulo="Comparador" fase="Fase 8" descripcion="De 2 a 4 proveedores lado a lado." />}
-          />
-          <Route
-            path="reportes"
-            element={<PaginaPendiente titulo="Reportes" fase="Fase 8" descripcion="Ranking de proveedores por calificación y por riesgo." />}
           />
 
           <Route element={<RequireRole roles={["administrador"]} />}>
