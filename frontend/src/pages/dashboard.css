@@ -1,0 +1,350 @@
+.dash {
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding-bottom: 48px;
+}
+
+.dash-cabecera h1 {
+  margin: 0 0 6px;
+  font-size: 1.9rem;
+}
+
+.dash-cabecera p {
+  max-width: 760px;
+  margin: 0;
+  color: #52606d;
+}
+
+/* ---------- Indicadores principales ---------- */
+.dash-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 24px;
+}
+
+.kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 24px 26px;
+  background: #fff;
+  border: 1px solid var(--borde);
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(11, 37, 69, 0.04);
+}
+
+.kpi-etiqueta {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #52606d;
+}
+
+.kpi-valor {
+  font-size: 2.8rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--azul);
+  font-variant-numeric: tabular-nums;
+}
+
+.kpi.alerta .kpi-valor {
+  color: var(--rojo);
+}
+
+.kpi.alerta {
+  border-top: 4px solid var(--rojo);
+}
+
+.kpi-pie {
+  margin-top: 6px;
+  font-size: 0.9rem;
+}
+
+/* ---------- Paneles ---------- */
+.dash-fila {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 24px;
+}
+
+.dash-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 28px;
+  background: #fff;
+  border: 1px solid var(--borde);
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(11, 37, 69, 0.04);
+}
+
+.dash-panel-cabecera {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dash-panel-cabecera h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.dash-panel-cabecera a {
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.dash-vacio {
+  margin: 0;
+  padding: 24px 0;
+  text-align: center;
+  color: #52606d;
+}
+
+/* ---------- Dona de riesgo ---------- */
+.dona-cuerpo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+}
+
+.dona {
+  width: 190px;
+  height: 190px;
+  flex: none;
+}
+
+.dona-pista {
+  fill: none;
+  stroke: #eef2f6;
+  stroke-width: 5;
+}
+
+.dona-segmento {
+  fill: none;
+  stroke-width: 5;
+}
+
+.dona-total {
+  font-size: 8px;
+  font-weight: 700;
+  fill: var(--azul);
+  text-anchor: middle;
+}
+
+.dona-texto {
+  font-size: 2.6px;
+  fill: #52606d;
+  text-anchor: middle;
+}
+
+.leyenda {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 180px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.leyenda li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.leyenda-punto {
+  width: 12px;
+  height: 12px;
+  flex: none;
+  border-radius: 50%;
+}
+
+.leyenda-nombre {
+  flex: 1;
+}
+
+.leyenda-cifra {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.leyenda-porcentaje {
+  width: 44px;
+  text-align: right;
+  font-size: 0.85rem;
+  color: #52606d;
+}
+
+/* ---------- Barras ---------- */
+.barras {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.barra-cabecera {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.barra-nombre {
+  font-weight: 600;
+}
+
+.barra-cifra {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.barra-pista {
+  height: 12px;
+  overflow: hidden;
+  background: #eef2f6;
+  border-radius: 999px;
+}
+
+.barra-relleno {
+  height: 100%;
+  min-width: 0;
+  border-radius: 999px;
+  transition: width 0.6s ease;
+}
+
+.barra-meta {
+  margin-top: 6px;
+  font-size: 0.85rem;
+  color: #52606d;
+}
+
+.ranking-fila {
+  display: flex;
+  gap: 16px;
+}
+
+.ranking-puesto {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  place-items: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--azul);
+  background: #f3e9cf;
+  border-radius: 50%;
+}
+
+.ranking-cuerpo {
+  flex: 1;
+  min-width: 0;
+}
+
+.ranking-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.ranking-nombre {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ranking-barra {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ranking-barra .barra-pista {
+  flex: 1;
+}
+
+/* ---------- Incidentes ---------- */
+.incidentes {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.incidente {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--borde);
+}
+
+.incidente:first-child {
+  padding-top: 0;
+}
+
+.incidente:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.incidente-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.incidente-proveedor {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.incidente-texto {
+  margin: 0;
+  overflow: hidden;
+  color: #3e4c59;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.incidente-meta {
+  font-size: 0.85rem;
+  color: #52606d;
+}
+
+@media (max-width: 800px) {
+  .dash-fila {
+    grid-template-columns: 1fr;
+  }
+
+  .dash-panel {
+    padding: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .barra-relleno {
+    transition: none;
+  }
+}
