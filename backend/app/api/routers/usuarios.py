@@ -81,7 +81,7 @@ def crear(datos: UsuarioCrear, db: Session = Depends(get_db), _admin: Usuario = 
         db.commit()
     except IntegrityError:  # dos administradores crearon el mismo correo a la vez
         db.rollback()
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Ya existe un usuario con ese correo.")
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Ya existe un usuario con ese correo.") from None
     db.refresh(usuario)
     return usuario
 
@@ -113,7 +113,7 @@ def actualizar(
             admins_activos=admins_activos,
         )
     except ReglaUsuario as error:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(error))
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(error)) from None
     for campo, valor in datos.items():
         setattr(usuario, campo, valor)
     db.commit()

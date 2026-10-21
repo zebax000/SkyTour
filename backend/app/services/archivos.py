@@ -49,7 +49,7 @@ def leer_archivo(nombre: str, contenido_base64: str) -> ArchivoLeido:
     try:
         datos = base64.b64decode(contenido_base64, validate=True)
     except (binascii.Error, ValueError):
-        raise ArchivoInvalido("El archivo no llegó completo o está dañado. Intenta subirlo de nuevo.")
+        raise ArchivoInvalido("El archivo no llegó completo o está dañado. Intenta subirlo de nuevo.") from None
     if not datos:
         raise ArchivoInvalido("El archivo está vacío.")
     if len(datos) > MAX_BYTES:

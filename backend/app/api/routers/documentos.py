@@ -98,7 +98,7 @@ def extraer(datos: ExtraccionIn, _admin: Usuario = Depends(solo_admin)):
     try:
         leido = leer_archivo(datos.archivo.nombre, datos.archivo.contenido_base64)
     except ArchivoInvalido as error:
-        raise _invalido(error)
+        raise _invalido(error) from None
     return extraer_datos(leido.datos, leido.tipo_mime)
 
 
@@ -133,7 +133,7 @@ def crear(
     try:
         leido = leer_archivo(datos.archivo.nombre, datos.archivo.contenido_base64)
     except ArchivoInvalido as error:
-        raise _invalido(error)
+        raise _invalido(error) from None
 
     documento = Documento(
         proveedor_id=proveedor_id,
@@ -174,7 +174,7 @@ def actualizar(
         try:
             leido = leer_archivo(datos.archivo.nombre, datos.archivo.contenido_base64)
         except ArchivoInvalido as error:
-            raise _invalido(error)
+            raise _invalido(error) from None
 
     for campo, valor in cambios.items():
         setattr(documento, campo, valor)

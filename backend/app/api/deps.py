@@ -29,7 +29,7 @@ def get_current_user(
         payload = decode_access_token(credenciales.credentials)
         user_id = int(payload["sub"])
     except (jwt.InvalidTokenError, ValueError):
-        raise _no_autenticado()
+        raise _no_autenticado() from None
     usuario = db.get(Usuario, user_id)
     if usuario is None or not usuario.activo:
         raise _no_autenticado()

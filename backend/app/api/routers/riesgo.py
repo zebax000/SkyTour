@@ -17,9 +17,9 @@ def _calcular(db, proveedor_id):
     try:
         return calcular_para_proveedor(db, proveedor_id)
     except LookupError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=404, detail=str(e)) from None
     except ValueError:
-        raise HTTPException(status_code=503, detail='Configuración de pesos inválida. Los cinco pesos deben sumar 100.')
+        raise HTTPException(status_code=503, detail='Configuración de pesos inválida. Los cinco pesos deben sumar 100.') from None
 
 
 @router.get('/proveedores/{proveedor_id}/riesgo', dependencies=[Depends(get_current_user)])

@@ -68,7 +68,7 @@ def _confirmar(db: Session) -> None:
         db.commit()
     except IntegrityError:
         db.rollback()
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Ya existe un registro con esos datos.")
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Ya existe un registro con esos datos.") from None
 
 
 @router.get("", response_model=PaginaProveedores, dependencies=[Depends(get_current_user)])

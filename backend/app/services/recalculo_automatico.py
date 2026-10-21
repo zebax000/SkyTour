@@ -41,7 +41,7 @@ def recalcular_cambios(db):
     Los análisis de riesgo no vuelven a disparar este cálculo.
     """
     objetos = list(db.new) + list(db.dirty) + list(db.deleted)
-    if not any(isinstance(o, (Proveedor, Tarifa) + DEPENDIENTES) for o in objetos):
+    if not any(isinstance(o, (Proveedor, Tarifa, *DEPENDIENTES)) for o in objetos):
         return
     # Primero se escriben los cambios: así los hijos creados por relación ya tienen su clave foránea.
     db.flush()
