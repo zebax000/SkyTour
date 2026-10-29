@@ -18,12 +18,18 @@ import { ProveedoresPage } from "./pages/ProveedoresPage";
 import { ReportesPage } from "./pages/ReportesPage";
 import { SinPermisoPage } from "./pages/SinPermisoPage";
 import { UsuariosPage } from "./pages/UsuariosPage";
+import { OlvideContrasenaPage } from './pages/OlvideContrasenaPage';
+import { RestablecerContrasenaPage } from './pages/RestablecerContrasenaPage';
 
 export default function App() {
   return (
     <Routes>
+      {/* --- RUTAS PÚBLICAS --- */}
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/olvide-contrasena" element={<OlvideContrasenaPage />} />
+      <Route path="/restablecer-contrasena" element={<RestablecerContrasenaPage />} />
 
+      {/* --- RUTAS PRIVADAS --- */}
       <Route element={<RequireAuth />}>
         <Route element={<Layout />}>
           <Route index element={<InicioPage />} />

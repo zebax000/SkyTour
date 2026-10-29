@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-
 import { riesgoApi, type Explicacion, type NivelRiesgo, type ResultadoRiesgo } from "../api/riesgo";
 import "./riesgo.css";
 
@@ -41,25 +40,63 @@ export function RiesgoProveedor({ proveedorId, puedeRegistrar }: { proveedorId: 
   const [resultado, setResultado] = useState<ResultadoRiesgo | null>(null);
   const [explicacion, setExplicacion] = useState<Explicacion | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [ocupado, setOcupado] = useState<"recalcular" | "explicar" | null>(null);
+  const [ocupado, setOcupado] = useState<"recalcular" | "regenerar" | null>(null);
+  const [cargandoIA, setCargandoIA] = useState(false);
 
   useEffect(() => {
     let vigente = true;
     setResultado(null);
     setExplicacion(null);
     setError(null);
-    riesgoApi
-      .consultar(proveedorId)
-      .then((r) => {
-        if (vigente) setResultado(r);
-      })
-      .catch((e) => {
-        if (vigente) setError(mensajeDe(e, "No se pudo cargar el riesgo."));
-      });
+    setCargandoIA(true);
+
+    const cargarRiesgoYExplicacion = async () => {
+      try {
+        // 1. Consultar el riesgo base
+        const res = await riesgoApi.consultar(proveedorId);
+        if (!vigente) return;
+        setResultado(res);
+
+        // 2. Pedir la explicación automáticamente
+        pedirExplicacionConReintento(proveedorId, vigente);
+      } catch (e) {
+        if (vigente) {
+          setError(mensajeDe(e, "No se pudo cargar el riesgo."));
+          setCargandoIA(false);
+        }
+      }
+    };
+
+    cargarRiesgoYExplicacion();
+
     return () => {
       vigente = false;
     };
   }, [proveedorId]);
+
+  // Función recursiva para reintentar si Gemini alcanza el límite de llamadas
+  const pedirExplicacionConReintento = async (id: number, vigente: boolean, esReintento = false) => {
+    try {
+      // Necesitarás añadir este método a riesgoApi en frontend/src/api/riesgo.ts
+      const data = await riesgoApi.obtenerExplicacion(id);
+      if (!vigente) return;
+
+      if (data.origen === "reglas" && data.motivo === "limite_de_frecuencia" && !esReintento) {
+        // Reintentar automáticamente una sola vez tras esperar 5 segundos
+        setTimeout(() => {
+          pedirExplicacionConReintento(id, vigente, true);
+        }, 5000);
+      } else {
+        setExplicacion(data);
+        setCargandoIA(false);
+      }
+    } catch (e) {
+      if (vigente) {
+        console.error("Error al cargar la explicación:", e);
+        setCargandoIA(false);
+      }
+    }
+  };
 
   async function recalcular() {
     setOcupado("recalcular");
@@ -67,25 +104,30 @@ export function RiesgoProveedor({ proveedorId, puedeRegistrar }: { proveedorId: 
     try {
       setResultado(await riesgoApi.recalcular(proveedorId));
       setExplicacion(null);
+      // Al recalcular, volvemos a pedir la explicación automáticamente
+      setCargandoIA(true);
+      pedirExplicacionConReintento(proveedorId, true, false);
     } catch (e) {
       setError(mensajeDe(e, "No se pudo recalcular el riesgo."));
-    } finally {
       setOcupado(null);
     }
   }
 
-  async function explicar() {
-    setOcupado("explicar");
+  // Ahora esta función se llama "regenerar" y usa la ruta POST existente
+  async function regenerar() {
+    setOcupado("regenerar");
     setError(null);
+    setCargandoIA(true);
     try {
       const { resumen, acciones, origen, modelo, modelo_solicitado, motivo, aviso, ...calculo } =
-        await riesgoApi.explicar(proveedorId);
+        await riesgoApi.explicar(proveedorId); // Tu API que hace el POST
       setResultado(calculo);
       setExplicacion({ resumen, acciones, origen, modelo, modelo_solicitado, motivo, aviso });
     } catch (e) {
-      setError(mensajeDe(e, "No se pudo generar la explicación."));
+      setError(mensajeDe(e, "No se pudo regenerar la explicación."));
     } finally {
       setOcupado(null);
+      setCargandoIA(false);
     }
   }
 
@@ -135,13 +177,18 @@ export function RiesgoProveedor({ proveedorId, puedeRegistrar }: { proveedorId: 
           <button type="button" className="boton secundario pequeno" disabled={ocupado !== null} onClick={recalcular}>
             {ocupado === "recalcular" ? "Recalculando…" : "Recalcular"}
           </button>
-          <button type="button" className="boton pequeno" disabled={ocupado !== null} onClick={explicar}>
-            {ocupado === "explicar" ? "Generando…" : "Generar explicación"}
+          <button type="button" className="boton pequeno" disabled={ocupado !== null} onClick={regenerar}>
+            {ocupado === "regenerar" ? "Generando…" : "Regenerar"}
           </button>
         </div>
       )}
 
-      {explicacion && (
+      {/* Aquí mostramos el estado de carga o la explicación final */}
+      {cargandoIA ? (
+        <div className="aviso-carga" style={{ marginTop: '1rem', fontStyle: 'italic', color: '#666' }}>
+          Analizando con IA...
+        </div>
+      ) : explicacion ? (
         <div className="riesgo-explicacion">
           <p>{explicacion.resumen}</p>
           <ul>
@@ -162,7 +209,7 @@ export function RiesgoProveedor({ proveedorId, puedeRegistrar }: { proveedorId: 
             </p>
           )}
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

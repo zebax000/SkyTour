@@ -54,10 +54,22 @@ export function DocumentosProveedor({ proveedorId, puedeEditar }: Props) {
 
   const [formAbierto, setFormAbierto] = useState(false);
   const [editando, setEditando] = useState<Documento | null>(null);
+  
+  // Estados originales
   const [tipo, setTipo] = useState("");
   const [emision, setEmision] = useState("");
   const [vencimiento, setVencimiento] = useState("");
   const [archivo, setArchivo] = useState<File | null>(null);
+  
+  // NUEVOS ESTADOS IA
+  const [entidadEmisora, setEntidadEmisora] = useState("");
+  const [numeroDocumento, setNumeroDocumento] = useState("");
+  const [titular, setTitular] = useState("");
+  const [identificacionTitular, setIdentificacionTitular] = useState("");
+  const [lugar, setLugar] = useState("");
+  const [objeto, setObjeto] = useState("");
+  const [resumen, setResumen] = useState("");
+
   const [claveArchivo, setClaveArchivo] = useState(0);
   const [errores, setErrores] = useState<Errores>({});
   const [enviando, setEnviando] = useState(false);
@@ -84,6 +96,14 @@ export function DocumentosProveedor({ proveedorId, puedeEditar }: Props) {
     setEmision("");
     setVencimiento("");
     setArchivo(null);
+    setEntidadEmisora("");
+    setNumeroDocumento("");
+    setTitular("");
+    setIdentificacionTitular("");
+    setLugar("");
+    setObjeto("");
+    setResumen("");
+    
     setClaveArchivo((k) => k + 1);
     setErrores({});
     setAvisoIA(null);
@@ -101,6 +121,13 @@ export function DocumentosProveedor({ proveedorId, puedeEditar }: Props) {
     setTipo(documento.tipo);
     setEmision(documento.fecha_emision);
     setVencimiento(documento.fecha_vencimiento);
+    setEntidadEmisora(documento.entidad_emisora || "");
+    setNumeroDocumento(documento.numero_documento || "");
+    setTitular(documento.titular || "");
+    setIdentificacionTitular(documento.identificacion_titular || "");
+    setLugar(documento.lugar || "");
+    setObjeto(documento.objeto || "");
+    setResumen(documento.resumen || "");
     setFormAbierto(true);
   }
 
@@ -127,7 +154,6 @@ export function DocumentosProveedor({ proveedorId, puedeEditar }: Props) {
     return e;
   }
 
-  // Pide a la IA que lea el archivo elegido y rellena el formulario; nada se guarda hasta que la persona confirme
   async function leerConIA() {
     if (!archivo) return;
     const problema = validarArchivoLocal(archivo);
@@ -149,23 +175,22 @@ export function DocumentosProveedor({ proveedorId, puedeEditar }: Props) {
         return;
       }
       const leidos: string[] = [];
-      if (propuesta.tipo) {
-        setTipo(propuesta.tipo);
-        leidos.push("el tipo");
-      }
-      if (propuesta.fecha_emision) {
-        setEmision(propuesta.fecha_emision);
-        leidos.push("la fecha de emisión");
-      }
-      if (propuesta.fecha_vencimiento) {
-        setVencimiento(propuesta.fecha_vencimiento);
-        leidos.push("la fecha de vencimiento");
-      }
+      if (propuesta.tipo) { setTipo(propuesta.tipo); leidos.push("el tipo"); }
+      if (propuesta.fecha_emision) { setEmision(propuesta.fecha_emision); leidos.push("emisión"); }
+      if (propuesta.fecha_vencimiento) { setVencimiento(propuesta.fecha_vencimiento); leidos.push("vencimiento"); }
+      if (propuesta.entidad_emisora) { setEntidadEmisora(propuesta.entidad_emisora); leidos.push("entidad"); }
+      if (propuesta.numero_documento) { setNumeroDocumento(propuesta.numero_documento); leidos.push("número"); }
+      if (propuesta.titular) { setTitular(propuesta.titular); leidos.push("titular"); }
+      if (propuesta.identificacion_titular) { setIdentificacionTitular(propuesta.identificacion_titular); leidos.push("identificación"); }
+      if (propuesta.lugar) { setLugar(propuesta.lugar); leidos.push("lugar"); }
+      if (propuesta.objeto) { setObjeto(propuesta.objeto); leidos.push("motivo"); }
+      if (propuesta.resumen) { setResumen(propuesta.resumen); leidos.push("resumen"); }
+
       setErrores({});
-      const faltan = 3 - leidos.length;
+      const faltan = 10 - leidos.length;
       setAvisoIA(
-        `La IA propuso ${leidos.join(", ")}. Revisa los datos antes de guardar.` +
-          (faltan > 0 ? ` No pudo leer ${faltan === 1 ? "un dato" : `${faltan} datos`}: completa lo que falta.` : "") +
+        `La IA propuso: ${leidos.join(", ")}. Revisa los datos antes de guardar.` +
+          (faltan > 0 ? ` Faltan ${faltan} datos por identificar.` : "") +
           (propuesta.advertencia ? ` ${propuesta.advertencia}` : ""),
       );
     } catch (e) {
@@ -185,18 +210,28 @@ export function DocumentosProveedor({ proveedorId, puedeEditar }: Props) {
     setErrorGeneral(null);
     try {
       const entrada = archivo ? { nombre: archivo.name, contenido_base64: await archivoABase64(archivo) } : null;
+      
+      const payloadBase = {
+        tipo: tipo.trim(),
+        fecha_emision: emision,
+        fecha_vencimiento: vencimiento,
+        entidad_emisora: entidadEmisora.trim() || null,
+        numero_documento: numeroDocumento.trim() || null,
+        titular: titular.trim() || null,
+        identificacion_titular: identificacionTitular.trim() || null,
+        lugar: lugar.trim() || null,
+        objeto: objeto.trim() || null,
+        resumen: resumen.trim() || null,
+      };
+
       if (editando) {
         await documentosApi.actualizar(editando.id, {
-          tipo: tipo.trim(),
-          fecha_emision: emision,
-          fecha_vencimiento: vencimiento,
+          ...payloadBase,
           ...(entrada ? { archivo: entrada } : {}),
         });
       } else if (entrada) {
         await documentosApi.crear(proveedorId, {
-          tipo: tipo.trim(),
-          fecha_emision: emision,
-          fecha_vencimiento: vencimiento,
+          ...payloadBase,
           archivo: entrada,
         });
       }
@@ -251,101 +286,79 @@ export function DocumentosProveedor({ proveedorId, puedeEditar }: Props) {
         <form className="grupo-servicio" onSubmit={guardar} noValidate>
           <div className="rejilla">
             <div className="campo-form">
-              <label htmlFor="doc-tipo">Tipo de documento</label>
-              <input
-                id="doc-tipo"
-                type="text"
-                list="tipos-documento"
-                value={tipo}
-                onChange={(e) => setTipo(e.target.value)}
-                aria-invalid={errores.tipo ? true : undefined}
-                aria-describedby={errores.tipo ? "error-doc-tipo" : undefined}
-              />
+              <label htmlFor="doc-tipo">Tipo de documento *</label>
+              <input id="doc-tipo" type="text" list="tipos-documento" value={tipo} onChange={(e) => setTipo(e.target.value)} aria-invalid={errores.tipo ? true : undefined} />
               <datalist id="tipos-documento">
-                {TIPOS_DOCUMENTO_SUGERIDOS.map((t) => (
-                  <option key={t} value={t} />
-                ))}
+                {TIPOS_DOCUMENTO_SUGERIDOS.map((t) => <option key={t} value={t} />)}
               </datalist>
-              {errores.tipo && (
-                <p className="error-campo" id="error-doc-tipo">
-                  {errores.tipo}
-                </p>
-              )}
+              {errores.tipo && <p className="error-campo">{errores.tipo}</p>}
             </div>
             <div className="campo-form">
-              <label htmlFor="doc-emision">Fecha de emisión</label>
-              <input
-                id="doc-emision"
-                type="date"
-                value={emision}
-                onChange={(e) => setEmision(e.target.value)}
-                aria-invalid={errores.emision ? true : undefined}
-                aria-describedby={errores.emision ? "error-doc-emision" : undefined}
-              />
-              {errores.emision && (
-                <p className="error-campo" id="error-doc-emision">
-                  {errores.emision}
-                </p>
-              )}
+              <label htmlFor="doc-emision">Fecha de emisión *</label>
+              <input id="doc-emision" type="date" value={emision} onChange={(e) => setEmision(e.target.value)} aria-invalid={errores.emision ? true : undefined} />
+              {errores.emision && <p className="error-campo">{errores.emision}</p>}
             </div>
             <div className="campo-form">
-              <label htmlFor="doc-vencimiento">Fecha de vencimiento</label>
-              <input
-                id="doc-vencimiento"
-                type="date"
-                value={vencimiento}
-                onChange={(e) => setVencimiento(e.target.value)}
-                aria-invalid={errores.vencimiento ? true : undefined}
-                aria-describedby={errores.vencimiento ? "error-doc-vencimiento" : undefined}
-              />
-              {errores.vencimiento && (
-                <p className="error-campo" id="error-doc-vencimiento">
-                  {errores.vencimiento}
-                </p>
-              )}
+              <label htmlFor="doc-vencimiento">Fecha de vencimiento *</label>
+              <input id="doc-vencimiento" type="date" value={vencimiento} onChange={(e) => setVencimiento(e.target.value)} aria-invalid={errores.vencimiento ? true : undefined} />
+              {errores.vencimiento && <p className="error-campo">{errores.vencimiento}</p>}
+            </div>
+
+            {/* CAMPOS NUEVOS */}
+            <div className="campo-form">
+              <label htmlFor="doc-entidad">Entidad emisora</label>
+              <input id="doc-entidad" type="text" value={entidadEmisora} onChange={(e) => setEntidadEmisora(e.target.value)} placeholder="Ej. Cámara de Comercio" />
             </div>
             <div className="campo-form">
+              <label htmlFor="doc-numero">Número de documento</label>
+              <input id="doc-numero" type="text" value={numeroDocumento} onChange={(e) => setNumeroDocumento(e.target.value)} placeholder="Ej. 12345678" />
+            </div>
+            <div className="campo-form">
+              <label htmlFor="doc-titular">Titular</label>
+              <input id="doc-titular" type="text" value={titular} onChange={(e) => setTitular(e.target.value)} placeholder="A nombre de..." />
+            </div>
+            <div className="campo-form">
+              <label htmlFor="doc-id-titular">Identificación Titular (NIT/C.C.)</label>
+              <input id="doc-id-titular" type="text" value={identificacionTitular} onChange={(e) => setIdentificacionTitular(e.target.value)} />
+            </div>
+            <div className="campo-form">
+              <label htmlFor="doc-lugar">Lugar / Ciudad</label>
+              <input id="doc-lugar" type="text" value={lugar} onChange={(e) => setLugar(e.target.value)} />
+            </div>
+            <div className="campo-form" style={{ gridColumn: "1 / -1" }}>
+              <label htmlFor="doc-objeto">Motivo o Alcance</label>
+              <input id="doc-objeto" type="text" value={objeto} onChange={(e) => setObjeto(e.target.value)} />
+            </div>
+            <div className="campo-form" style={{ gridColumn: "1 / -1" }}>
+              <label htmlFor="doc-resumen">Resumen (máx 2 frases)</label>
+              <textarea id="doc-resumen" value={resumen} onChange={(e) => setResumen(e.target.value)} rows={2} />
+            </div>
+
+            <div className="campo-form" style={{ gridColumn: "1 / -1" }}>
               <label htmlFor="doc-archivo">
-                {editando ? "Reemplazar archivo (opcional)" : "Archivo (PDF, JPG o PNG)"}
+                {editando ? "Reemplazar archivo (opcional)" : "Archivo (PDF, JPG o PNG) *"}
               </label>
               <input
-                key={claveArchivo}
-                id="doc-archivo"
-                type="file"
+                key={claveArchivo} id="doc-archivo" type="file"
                 accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
-                onChange={(e) => {
-                  setArchivo(e.target.files?.[0] ?? null);
-                  setAvisoIA(null);
-                }}
+                onChange={(e) => { setArchivo(e.target.files?.[0] ?? null); setAvisoIA(null); }}
                 aria-invalid={errores.archivo ? true : undefined}
-                aria-describedby="ayuda-doc-archivo"
               />
-              <p className="ayuda" id="ayuda-doc-archivo">
-                Máximo {MAX_ARCHIVO_MB} MB.{editando ? " Si no eliges uno, se conserva el actual." : ""}
-              </p>
+              <p className="ayuda">Máximo {MAX_ARCHIVO_MB} MB.{editando ? " Si no eliges uno, se conserva el actual." : ""}</p>
               {errores.archivo && <p className="error-campo">{errores.archivo}</p>}
               {archivo && (
-                <div>
+                <div style={{ marginTop: '0.5rem' }}>
                   <button type="button" className="boton secundario pequeno" disabled={leyendo || enviando} onClick={leerConIA}>
                     {leyendo ? "Leyendo…" : "Leer con IA"}
                   </button>
-                  <p className="ayuda">
-                    Al pulsar, el archivo se envía a Gemini (Google) para proponer el tipo y las fechas. Nada se guarda hasta que
-                    tú confirmes.
-                  </p>
+                  <p className="ayuda">Al pulsar, el archivo se envía a Gemini para extraer los datos. Nada se guarda hasta que confirmes.</p>
                 </div>
               )}
             </div>
           </div>
-          {avisoIA && (
-            <p className="ayuda" role="status">
-              {avisoIA}
-            </p>
-          )}
+          {avisoIA && <p className="ayuda" role="status" style={{ color: '#005a9e', fontWeight: 'bold' }}>{avisoIA}</p>}
           <div className="acciones-formulario">
-            <button type="button" className="boton secundario pequeno" onClick={cerrarFormulario}>
-              Cancelar
-            </button>
+            <button type="button" className="boton secundario pequeno" onClick={cerrarFormulario}>Cancelar</button>
             <button type="submit" className="boton primario pequeno" disabled={enviando || leyendo}>
               {enviando ? "Guardando…" : editando ? "Guardar cambios" : "Guardar documento"}
             </button>
@@ -354,11 +367,8 @@ export function DocumentosProveedor({ proveedorId, puedeEditar }: Props) {
       )}
 
       {documentos === null && !errorGeneral && <p className="ayuda">Cargando documentos…</p>}
-
-      {documentos !== null && documentos.length === 0 && (
-        <p className="ayuda">Este proveedor aún no tiene documentos registrados.</p>
-      )}
-
+      {documentos !== null && documentos.length === 0 && <p className="ayuda">Este proveedor aún no tiene documentos registrados.</p>}
+      
       {documentos !== null && documentos.length > 0 && (
         <div className="tabla-contenedor">
           <table className="tabla tabla-documentos">
@@ -366,27 +376,33 @@ export function DocumentosProveedor({ proveedorId, puedeEditar }: Props) {
             <thead>
               <tr>
                 <th scope="col">Documento</th>
-                <th scope="col" className="col-fecha">
-                  Emisión
-                </th>
-                <th scope="col" className="col-fecha">
-                  Vencimiento
-                </th>
-                <th scope="col" className="col-estado">
-                  Estado
-                </th>
+                <th scope="col" className="col-fecha">Emisión</th>
+                <th scope="col" className="col-fecha">Vencimiento</th>
+                <th scope="col" className="col-estado">Estado</th>
                 <th scope="col">Archivo</th>
-                {puedeEditar && (
-                  <th scope="col" className="col-acciones">
-                    Acciones
-                  </th>
-                )}
+                {puedeEditar && <th scope="col" className="col-acciones">Acciones</th>}
               </tr>
             </thead>
             <tbody>
               {documentos.map((d) => (
                 <tr key={d.id}>
-                  <td>{d.tipo}</td>
+                  <td>
+                    <strong>{d.tipo}</strong>
+                    {/* Información secundaria extraída */}
+                    {(d.entidad_emisora || d.numero_documento || d.titular || d.lugar) && (
+                      <div style={{ fontSize: '0.85em', color: '#555', marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                        {d.entidad_emisora && <span>🏢 Entidad: {d.entidad_emisora}</span>}
+                        {d.numero_documento && <span>#️⃣ Número: {d.numero_documento}</span>}
+                        {d.titular && <span>👤 Titular: {d.titular} {d.identificacion_titular ? `(${d.identificacion_titular})` : ''}</span>}
+                        {d.lugar && <span>📍 Lugar: {d.lugar}</span>}
+                      </div>
+                    )}
+                    {d.objeto && (
+                      <div style={{ fontSize: '0.85em', color: '#666', fontStyle: 'italic', marginTop: '4px' }}>
+                        Motivo: {d.objeto}
+                      </div>
+                    )}
+                  </td>
                   <td className="col-fecha">{formatearFecha(d.fecha_emision)}</td>
                   <td className="col-fecha">{formatearFecha(d.fecha_vencimiento)}</td>
                   <td className="col-estado">
@@ -396,14 +412,10 @@ export function DocumentosProveedor({ proveedorId, puedeEditar }: Props) {
                   <td>
                     {d.archivo ? (
                       <div className="celda-archivo">
-                        <span className="archivo-nombre" title={d.archivo.nombre}>
-                          {d.archivo.nombre}
-                        </span>
+                        <span className="archivo-nombre" title={d.archivo.nombre}>{d.archivo.nombre}</span>
                         <div className="archivo-meta">
                           <span className="archivo-tamano">{formatearTamano(d.archivo.tamano)}</span>
-                          <button type="button" className="boton secundario pequeno" onClick={() => descargar(d)}>
-                            Descargar
-                          </button>
+                          <button type="button" className="boton secundario pequeno" onClick={() => descargar(d)}>Descargar</button>
                         </div>
                       </div>
                     ) : (
@@ -413,12 +425,8 @@ export function DocumentosProveedor({ proveedorId, puedeEditar }: Props) {
                   {puedeEditar && (
                     <td className="col-acciones">
                       <div className="acciones-fila">
-                        <button type="button" className="boton secundario pequeno" onClick={() => abrirEdicion(d)}>
-                          Editar
-                        </button>
-                        <button type="button" className="boton secundario pequeno" onClick={() => quitar(d)}>
-                          Quitar
-                        </button>
+                        <button type="button" className="boton secundario pequeno" onClick={() => abrirEdicion(d)}>Editar</button>
+                        <button type="button" className="boton secundario pequeno" onClick={() => quitar(d)}>Quitar</button>
                       </div>
                     </td>
                   )}

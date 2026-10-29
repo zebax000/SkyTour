@@ -16,6 +16,15 @@ export interface DocumentoEntrada {
   fecha_emision: string;
   fecha_vencimiento: string;
   archivo: ArchivoEntrada;
+  
+  // --- NUEVOS CAMPOS ---
+  entidad_emisora?: string | null;
+  numero_documento?: string | null;
+  titular?: string | null;
+  identificacion_titular?: string | null;
+  lugar?: string | null;
+  objeto?: string | null;
+  resumen?: string | null;
 }
 
 export interface DocumentoCambios {
@@ -23,6 +32,15 @@ export interface DocumentoCambios {
   fecha_emision?: string;
   fecha_vencimiento?: string;
   archivo?: ArchivoEntrada;
+  
+  // --- NUEVOS CAMPOS ---
+  entidad_emisora?: string | null;
+  numero_documento?: string | null;
+  titular?: string | null;
+  identificacion_titular?: string | null;
+  lugar?: string | null;
+  objeto?: string | null;
+  resumen?: string | null;
 }
 
 // Valores que propone la IA al leer un archivo; nunca se guardan solos
@@ -31,6 +49,16 @@ export interface ExtraccionDocumento {
   tipo: string | null;
   fecha_emision: string | null;
   fecha_vencimiento: string | null;
+  
+  // --- NUEVOS CAMPOS ---
+  entidad_emisora: string | null;
+  numero_documento: string | null;
+  titular: string | null;
+  identificacion_titular: string | null;
+  lugar: string | null;
+  objeto: string | null;
+  resumen: string | null;
+  
   modelo: string | null;
   modelo_solicitado: string | null;
   motivo: string | null;

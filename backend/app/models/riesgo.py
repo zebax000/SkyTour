@@ -1,5 +1,4 @@
 from datetime import datetime
-
 from sqlalchemy import (
     CheckConstraint,
     DateTime,
@@ -7,6 +6,8 @@ from sqlalchemy import (
     Index,
     SmallInteger,
     String,
+    Text,
+    JSON,
     UniqueConstraint,
     func,
 )
@@ -20,6 +21,13 @@ class AnalisisRiesgo(Base):
     """Resultado de un cálculo de riesgo. Guardar uno nuevo solo cuando el resultado cambia."""
 
     __tablename__ = "analisis_riesgo"
+
+
+    explicacion_resumen: Mapped[str | None] = mapped_column(Text)
+    explicacion_acciones: Mapped[dict | list | None] = mapped_column(JSON)
+    explicacion_origen: Mapped[str | None] = mapped_column(String(20))
+    explicacion_modelo: Mapped[str | None] = mapped_column(String(100))
+    explicacion_generada_en: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     id: Mapped[int] = mapped_column(primary_key=True)
     proveedor_id: Mapped[int] = mapped_column(ForeignKey("proveedor.id", ondelete="CASCADE"))

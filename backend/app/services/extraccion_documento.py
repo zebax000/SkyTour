@@ -41,6 +41,14 @@ class Extraccion(BaseModel):
     fecha_emision: str = Field(max_length=40)
     fecha_vencimiento: str = Field(max_length=40)
 
+    entidad_emisora: str | None = None
+    numero_documento: str | None = None
+    titular: str | None = None
+    identificacion_titular: str | None = None
+    lugar: str | None = None
+    objeto: str | None = None
+    resumen: str | None = None
+
 
 def _fecha(texto):
     try:
@@ -48,6 +56,12 @@ def _fecha(texto):
     except ValueError:
         return None
 
+
+def limpiar_cadena(valor: str | None, max_len: int) -> str | None:
+    if not valor:
+        return None
+    limpio = ' '.join(valor.split())
+    return limpio[:max_len] if limpio else None
 
 def interpretar(extraccion):
     """Convierte lo que devolvió Gemini en datos seguros: fechas válidas o nulas, tipo limpio y sin incoherencias."""
@@ -62,6 +76,13 @@ def interpretar(extraccion):
         'tipo': tipo,
         'fecha_emision': emision.isoformat() if emision else None,
         'fecha_vencimiento': vencimiento.isoformat() if vencimiento else None,
+        'entidad_emisora': limpiar_cadena(extraccion.entidad_emisora, 200),
+        'numero_documento': limpiar_cadena(extraccion.numero_documento, 100),
+        'titular': limpiar_cadena(extraccion.titular, 200),
+        'identificacion_titular': limpiar_cadena(extraccion.identificacion_titular, 50),
+        'lugar': limpiar_cadena(extraccion.lugar, 120),
+        'objeto': limpiar_cadena(extraccion.objeto, 300),
+        'resumen': limpiar_cadena(extraccion.resumen, 500),
         'advertencia': advertencia,
     }
 

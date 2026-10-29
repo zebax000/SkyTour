@@ -124,12 +124,12 @@ export function DocumentosPage() {
 
       <div className="barra-filtros" role="search">
         <label className="campo ancho">
-          Buscar por proveedor o tipo de documento
+          Buscar por proveedor, tipo, entidad, número o titular
           <input
             type="search"
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
-            placeholder="Ej. Aurora o RNT"
+            placeholder="Ej. Aurora o Cámara de Comercio"
           />
         </label>
         <label className="campo">
@@ -182,7 +182,16 @@ export function DocumentosPage() {
                 <td>
                   <Link to={`/proveedores/${d.proveedor_id}`}>{d.proveedor_nombre}</Link>
                 </td>
-                <td>{d.tipo}</td>
+                <td>
+                  <strong>{d.tipo}</strong>
+                  {/* AQUÍ SE MUESTRAN LOS CAMPOS NUEVOS DE LA IA */}
+                  {(d.entidad_emisora || d.numero_documento) && (
+                    <div style={{ fontSize: '0.85em', color: '#555', marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      {d.entidad_emisora && <span>🏢 Entidad: {d.entidad_emisora}</span>}
+                      {d.numero_documento && <span>#️⃣ Número: {d.numero_documento}</span>}
+                    </div>
+                  )}
+                </td>
                 <td>{formatearFecha(d.fecha_vencimiento)}</td>
                 <td>
                   <InsigniaDocumento estado={d.estado} />

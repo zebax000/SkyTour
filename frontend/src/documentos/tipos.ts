@@ -12,6 +12,17 @@ export interface Documento {
   tipo: string;
   fecha_emision: string;
   fecha_vencimiento: string;
+  
+  // --- NUEVOS CAMPOS EXTRAÍDOS POR IA ---
+  entidad_emisora?: string | null;
+  numero_documento?: string | null;
+  titular?: string | null;
+  identificacion_titular?: string | null;
+  lugar?: string | null;
+  objeto?: string | null;
+  resumen?: string | null;
+  // --------------------------------------
+  
   creado_en: string;
   archivo: ArchivoInfo | null;
   estado: EstadoDocumento;
