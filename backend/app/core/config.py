@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/main
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -8,12 +12,17 @@ class Settings(BaseSettings):
     database_url: str
     secret_key: str = CLAVE_DE_EJEMPLO
     access_token_expire_minutes: int = 60
+<<<<<<< HEAD
     reset_token_expire_minutes: int = 30
     frontend_url: str = "http://localhost:5173"
     seed_password: str | None = None  # solo para el script de datos de demostración
     brevo_api_key: str | None = None
     correo_remitente: str | None = None
     correo_nombre_remitente: str = "SkyTour"
+=======
+    frontend_url: str = "http://localhost:5173"
+    seed_password: str | None = None  # solo para el script de datos de demostración
+>>>>>>> origin/main
 
     model_config = SettingsConfigDict(env_file=("../.env", ".env"), extra="ignore")
 

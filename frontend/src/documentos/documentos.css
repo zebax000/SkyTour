@@ -21,6 +21,7 @@
   color: #52606d;
 }
 
+<<<<<<< HEAD
 .doc-titulo {
   display: block;
   font-weight: 600;
@@ -42,6 +43,8 @@
   font-style: italic;
 }
 
+=======
+>>>>>>> origin/main
 /* Tabla de documentos: las columnas cortas se ajustan a su contenido y el resto se reparte el espacio */
 .tabla-documentos th,
 .tabla-documentos td {

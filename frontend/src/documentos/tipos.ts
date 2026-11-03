@@ -12,6 +12,7 @@ export interface Documento {
   tipo: string;
   fecha_emision: string;
   fecha_vencimiento: string;
+<<<<<<< HEAD
   entidad_emisora: string | null;
   numero_documento: string | null;
   titular: string | null;
@@ -19,12 +20,26 @@ export interface Documento {
   lugar: string | null;
   objeto: string | null;
   resumen: string | null;
+=======
+  
+  // --- NUEVOS CAMPOS EXTRAÍDOS POR IA ---
+  entidad_emisora?: string | null;
+  numero_documento?: string | null;
+  titular?: string | null;
+  identificacion_titular?: string | null;
+  lugar?: string | null;
+  objeto?: string | null;
+  resumen?: string | null;
+  // --------------------------------------
+  
+>>>>>>> origin/main
   creado_en: string;
   archivo: ArchivoInfo | null;
   estado: EstadoDocumento;
   dias_restantes: number;
 }
 
+<<<<<<< HEAD
 // Valores que propone la IA al leer un archivo; nunca se guardan solos
 export interface ExtraccionDocumento {
   origen: "gemini" | "ninguno";
@@ -44,6 +59,8 @@ export interface ExtraccionDocumento {
   advertencia: string | null;
 }
 
+=======
+>>>>>>> origin/main
 export interface DocumentoConProveedor extends Documento {
   proveedor_nombre: string;
 }

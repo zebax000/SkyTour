@@ -1,14 +1,20 @@
 import { tokenStorage } from "../auth/tokenStorage";
 import type {
   Documento,
+<<<<<<< HEAD
   ExtraccionDocumento,
+=======
+>>>>>>> origin/main
   PaginaDocumentos,
   ResumenDocumentos,
 } from "../documentos/tipos";
 import { API_URL, ApiError, apiFetch } from "./client";
 
+<<<<<<< HEAD
 export type { ExtraccionDocumento };
 
+=======
+>>>>>>> origin/main
 export interface ArchivoEntrada {
   nombre: string;
   contenido_base64: string;
@@ -18,6 +24,12 @@ export interface DocumentoEntrada {
   tipo: string;
   fecha_emision: string;
   fecha_vencimiento: string;
+<<<<<<< HEAD
+=======
+  archivo: ArchivoEntrada;
+  
+  // --- NUEVOS CAMPOS ---
+>>>>>>> origin/main
   entidad_emisora?: string | null;
   numero_documento?: string | null;
   titular?: string | null;
@@ -25,13 +37,22 @@ export interface DocumentoEntrada {
   lugar?: string | null;
   objeto?: string | null;
   resumen?: string | null;
+<<<<<<< HEAD
   archivo: ArchivoEntrada;
+=======
+>>>>>>> origin/main
 }
 
 export interface DocumentoCambios {
   tipo?: string;
   fecha_emision?: string;
   fecha_vencimiento?: string;
+<<<<<<< HEAD
+=======
+  archivo?: ArchivoEntrada;
+  
+  // --- NUEVOS CAMPOS ---
+>>>>>>> origin/main
   entidad_emisora?: string | null;
   numero_documento?: string | null;
   titular?: string | null;
@@ -39,7 +60,32 @@ export interface DocumentoCambios {
   lugar?: string | null;
   objeto?: string | null;
   resumen?: string | null;
+<<<<<<< HEAD
   archivo?: ArchivoEntrada;
+=======
+}
+
+// Valores que propone la IA al leer un archivo; nunca se guardan solos
+export interface ExtraccionDocumento {
+  origen: "gemini" | "ninguno";
+  tipo: string | null;
+  fecha_emision: string | null;
+  fecha_vencimiento: string | null;
+  
+  // --- NUEVOS CAMPOS ---
+  entidad_emisora: string | null;
+  numero_documento: string | null;
+  titular: string | null;
+  identificacion_titular: string | null;
+  lugar: string | null;
+  objeto: string | null;
+  resumen: string | null;
+  
+  modelo: string | null;
+  modelo_solicitado: string | null;
+  motivo: string | null;
+  advertencia: string | null;
+>>>>>>> origin/main
 }
 
 export interface FiltrosDocumentos {
@@ -98,4 +144,8 @@ export const documentosApi = {
     }
     return await respuesta.blob();
   },
+<<<<<<< HEAD
 };
+=======
+};
+>>>>>>> origin/main

@@ -1,5 +1,8 @@
 from datetime import datetime
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
 from sqlalchemy import (
     CheckConstraint,
     DateTime,
@@ -7,6 +10,11 @@ from sqlalchemy import (
     Index,
     SmallInteger,
     String,
+<<<<<<< HEAD
+=======
+    Text,
+    JSON,
+>>>>>>> origin/main
     UniqueConstraint,
     func,
 )
@@ -21,6 +29,16 @@ class AnalisisRiesgo(Base):
 
     __tablename__ = "analisis_riesgo"
 
+<<<<<<< HEAD
+=======
+
+    explicacion_resumen: Mapped[str | None] = mapped_column(Text)
+    explicacion_acciones: Mapped[dict | list | None] = mapped_column(JSON)
+    explicacion_origen: Mapped[str | None] = mapped_column(String(20))
+    explicacion_modelo: Mapped[str | None] = mapped_column(String(100))
+    explicacion_generada_en: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+>>>>>>> origin/main
     id: Mapped[int] = mapped_column(primary_key=True)
     proveedor_id: Mapped[int] = mapped_column(ForeignKey("proveedor.id", ondelete="CASCADE"))
     puntaje: Mapped[int | None] = mapped_column(SmallInteger)  # nulo si no hay datos suficientes

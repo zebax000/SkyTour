@@ -53,7 +53,11 @@ def _con_proveedor(documento: Documento, nombre_proveedor: str) -> dict:
 @router.get("/documentos", response_model=PaginaDocumentos, dependencies=[Depends(get_current_user)])
 def listar(
     estado: EstadoDocumento | None = None,
+<<<<<<< HEAD
     q: str | None = Query(None, description="Busca por proveedor o tipo de documento"),
+=======
+    q: str | None = Query(None, description="Busca por proveedor, tipo, entidad, número o titular"),
+>>>>>>> origin/main
     pagina: int = Query(1, ge=1),
     tamano: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db),
@@ -63,8 +67,18 @@ def listar(
         filtros.append(_condicion_estado(estado))
     if q and q.strip():
         patron = f"%{_escapar_like(q.strip())}%"
+<<<<<<< HEAD
         filtros.append(or_(Proveedor.nombre.ilike(patron, escape="\\"), Documento.tipo.ilike(patron, escape="\\")))
 
+=======
+        filtros.append(or_(
+            Proveedor.nombre.ilike(patron, escape="\\"), 
+            Documento.tipo.ilike(patron, escape="\\"),
+            Documento.entidad_emisora.ilike(patron, escape="\\"),
+            Documento.numero_documento.ilike(patron, escape="\\"),
+            Documento.titular.ilike(patron, escape="\\")
+        ))
+>>>>>>> origin/main
     union = Proveedor.id == Documento.proveedor_id
     total = db.scalar(select(func.count(Documento.id)).join(Proveedor, union).where(*filtros)) or 0
     filas = db.execute(
@@ -82,7 +96,10 @@ def listar(
         "tamano": tamano,
     }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
 @router.get("/documentos/resumen", response_model=ResumenDocumentos, dependencies=[Depends(get_current_user)])
 def resumen(db: Session = Depends(get_db)):
     def contar(estado: str) -> int:
@@ -140,6 +157,20 @@ def crear(
         tipo=datos.tipo,
         fecha_emision=datos.fecha_emision,
         fecha_vencimiento=datos.fecha_vencimiento,
+<<<<<<< HEAD
+=======
+        
+        # --- NUEVOS CAMPOS ---
+        entidad_emisora=datos.entidad_emisora,
+        numero_documento=datos.numero_documento,
+        titular=datos.titular,
+        identificacion_titular=datos.identificacion_titular,
+        lugar=datos.lugar,
+        objeto=datos.objeto,
+        resumen=datos.resumen,
+        # ---------------------
+        
+>>>>>>> origin/main
         archivo=DocumentoArchivo(
             nombre=leido.nombre, tipo_mime=leido.tipo_mime, tamano=len(leido.datos), datos=leido.datos
         ),
@@ -149,7 +180,10 @@ def crear(
     db.commit()
     return documento
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
 @router.patch("/documentos/{documento_id}", response_model=DocumentoOut)
 def actualizar(
     documento_id: int,

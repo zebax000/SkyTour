@@ -97,6 +97,7 @@ class CambioContrasena(BaseModel):
     @classmethod
     def _nueva(cls, v: str) -> str:
         return _revisar_contrasena(v)
+<<<<<<< HEAD
 
 
 class SolicitudRestablecimiento(BaseModel):
@@ -124,3 +125,5 @@ class RestablecimientoIn(BaseModel):
     @classmethod
     def _nueva(cls, v: str) -> str:
         return _revisar_contrasena(v)
+=======
+>>>>>>> origin/main

@@ -1,5 +1,9 @@
 import { useState, type FormEvent } from "react";
+<<<<<<< HEAD
 import { Link, Navigate, useLocation } from "react-router-dom";
+=======
+import { Navigate, useLocation } from "react-router-dom";
+>>>>>>> origin/main
 
 import { useAuth } from "../auth/useAuth";
 import { Logo } from "../components/Logo";
@@ -67,10 +71,13 @@ export function LoginPage() {
         <button type="submit" className="boton primario" disabled={enviando}>
           {enviando ? "Entrando…" : "Entrar"}
         </button>
+<<<<<<< HEAD
 
         <p className="enlace-olvide">
           <Link to="/olvide-contrasena">¿Olvidaste tu contraseña?</Link>
         </p>
+=======
+>>>>>>> origin/main
       </form>
     </main>
   );

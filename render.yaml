@@ -31,6 +31,7 @@ services:
         sync: false
       - key: GEMINI_MODEL
         value: gemini-3.5-flash-lite
+<<<<<<< HEAD
       # Opcional: correo transaccional con Brevo (API HTTPS) para restablecer contraseñas.
       - key: BREVO_API_KEY
         sync: false
@@ -38,3 +39,5 @@ services:
         sync: false
       - key: CORREO_NOMBRE_REMITENTE
         value: SkyTour
+=======
+>>>>>>> origin/main

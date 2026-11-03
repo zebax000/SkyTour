@@ -26,6 +26,16 @@ class Documento(Base):
     fecha_emision: Mapped[date] = mapped_column(Date)
     # El estado (vigente, por vencer, vencido) se calcula con esta fecha; no se guarda
     fecha_vencimiento: Mapped[date] = mapped_column(Date)
+<<<<<<< HEAD
+=======
+    entidad_emisora: Mapped[str | None] = mapped_column(String(200))
+    numero_documento: Mapped[str | None] = mapped_column(String(100))
+    titular: Mapped[str | None] = mapped_column(String(200))
+    identificacion_titular: Mapped[str | None] = mapped_column(String(50))
+    lugar: Mapped[str | None] = mapped_column(String(120))
+    objeto: Mapped[str | None] = mapped_column(String(300))
+    resumen: Mapped[str | None] = mapped_column(String(500))
+>>>>>>> origin/main
     archivo_url: Mapped[str | None] = mapped_column(String(500))  # sin uso: los archivos van en documento_archivo
     creado_en: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 

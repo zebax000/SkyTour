@@ -17,6 +17,7 @@ ARCHIVO = {"nombre": "rut.pdf", "contenido_base64": base64.b64encode(b"%PDF-1.4"
 
 
 # ---------- Validación de datos ----------
+<<<<<<< HEAD
 def test_documento_valido_sin_campos_opcionales():
     d = DocumentoIn(tipo=" RUT ", fecha_emision=date(2026, 1, 1), fecha_vencimiento=date(2027, 1, 1), archivo=ARCHIVO)
     assert d.tipo == "RUT"
@@ -41,6 +42,11 @@ def test_documento_valido_con_campos_nuevos_y_recorte():
     assert d.numero_documento == "RNT-123"
     assert d.lugar is None
     assert len(d.objeto) == 300
+=======
+def test_documento_valido():
+    d = DocumentoIn(tipo=" RUT ", fecha_emision=date(2026, 1, 1), fecha_vencimiento=date(2027, 1, 1), archivo=ARCHIVO)
+    assert d.tipo == "RUT"
+>>>>>>> origin/main
 
 
 def test_vencimiento_anterior_a_la_emision_se_rechaza():
@@ -58,6 +64,7 @@ def test_el_archivo_es_obligatorio_al_crear():
         DocumentoIn(tipo="RUT", fecha_emision=date(2026, 1, 1), fecha_vencimiento=date(2027, 1, 1))
 
 
+<<<<<<< HEAD
 def test_cambios_no_aceptan_valores_nulos_en_obligatorios_pero_si_en_opcionales():
     with pytest.raises(ValidationError):
         DocumentoCambios(tipo=None)
@@ -69,12 +76,23 @@ def test_cambios_no_aceptan_valores_nulos_en_obligatorios_pero_si_en_opcionales(
 
 # ---------- Estado calculado en la respuesta ----------
 def _documento(dias: int, con_metadatos: bool = False) -> SimpleNamespace:
+=======
+def test_cambios_no_aceptan_valores_nulos():
+    with pytest.raises(ValidationError):
+        DocumentoCambios(tipo=None)
+    assert DocumentoCambios(tipo="RNT").model_dump(exclude_unset=True) == {"tipo": "RNT"}
+
+
+# ---------- Estado calculado en la respuesta ----------
+def _documento(dias: int) -> SimpleNamespace:
+>>>>>>> origin/main
     return SimpleNamespace(
         id=1,
         proveedor_id=1,
         tipo="RNT",
         fecha_emision=hoy() - timedelta(days=400),
         fecha_vencimiento=hoy() + timedelta(days=dias),
+<<<<<<< HEAD
         entidad_emisora="MinCIT" if con_metadatos else None,
         numero_documento="RNT-001" if con_metadatos else None,
         titular="Hotel Aurora" if con_metadatos else None,
@@ -82,6 +100,8 @@ def _documento(dias: int, con_metadatos: bool = False) -> SimpleNamespace:
         lugar="Cartagena" if con_metadatos else None,
         objeto="Hospedaje" if con_metadatos else None,
         resumen="RNT activo." if con_metadatos else None,
+=======
+>>>>>>> origin/main
         creado_en=datetime(2026, 1, 1),
         archivo=None,
     )
@@ -95,6 +115,7 @@ def test_la_respuesta_trae_el_estado_y_los_dias(dias, estado):
     salida = DocumentoOut.model_validate(_documento(dias))
     assert salida.estado == estado
     assert salida.dias_restantes == dias
+<<<<<<< HEAD
     assert salida.entidad_emisora is None
 
 
@@ -107,6 +128,8 @@ def test_la_respuesta_devuelve_los_campos_nuevos():
     assert salida.lugar == "Cartagena"
     assert salida.objeto == "Hospedaje"
     assert salida.resumen == "RNT activo."
+=======
+>>>>>>> origin/main
 
 
 # ---------- Permisos de las rutas (sin base de datos) ----------

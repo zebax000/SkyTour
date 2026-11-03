@@ -11,23 +11,41 @@ import { IncidentesPage } from "./pages/IncidentesPage";
 import { InicioPage } from "./pages/InicioPage";
 import { LoginPage } from "./pages/LoginPage";
 import { NoEncontradaPage } from "./pages/NoEncontradaPage";
+<<<<<<< HEAD
 import { OlvideContrasenaPage } from "./pages/OlvideContrasenaPage";
+=======
+>>>>>>> origin/main
 import { ProveedorEditarPage } from "./pages/ProveedorEditarPage";
 import { ProveedorFichaPage } from "./pages/ProveedorFichaPage";
 import { ProveedorNuevoPage } from "./pages/ProveedorNuevoPage";
 import { ProveedoresPage } from "./pages/ProveedoresPage";
 import { ReportesPage } from "./pages/ReportesPage";
+<<<<<<< HEAD
 import { RestablecerContrasenaPage } from "./pages/RestablecerContrasenaPage";
 import { SinPermisoPage } from "./pages/SinPermisoPage";
 import { UsuariosPage } from "./pages/UsuariosPage";
+=======
+import { SinPermisoPage } from "./pages/SinPermisoPage";
+import { UsuariosPage } from "./pages/UsuariosPage";
+import { OlvideContrasenaPage } from './pages/OlvideContrasenaPage';
+import { RestablecerContrasenaPage } from './pages/RestablecerContrasenaPage';
+>>>>>>> origin/main
 
 export default function App() {
   return (
     <Routes>
+<<<<<<< HEAD
+=======
+      {/* --- RUTAS PÚBLICAS --- */}
+>>>>>>> origin/main
       <Route path="/login" element={<LoginPage />} />
       <Route path="/olvide-contrasena" element={<OlvideContrasenaPage />} />
       <Route path="/restablecer-contrasena" element={<RestablecerContrasenaPage />} />
 
+<<<<<<< HEAD
+=======
+      {/* --- RUTAS PRIVADAS --- */}
+>>>>>>> origin/main
       <Route element={<RequireAuth />}>
         <Route element={<Layout />}>
           <Route index element={<InicioPage />} />
@@ -56,4 +74,8 @@ export default function App() {
       </Route>
     </Routes>
   );
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> origin/main
