@@ -1,20 +1,14 @@
 from datetime import datetime
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/main
 from sqlalchemy import (
+    JSON,
     CheckConstraint,
     DateTime,
     ForeignKey,
     Index,
     SmallInteger,
     String,
-<<<<<<< HEAD
-=======
     Text,
-    JSON,
->>>>>>> origin/main
     UniqueConstraint,
     func,
 )
@@ -25,25 +19,19 @@ from app.models.enums import FactorRiesgo, NivelRiesgo, pg_enum
 
 
 class AnalisisRiesgo(Base):
-    """Resultado de un cálculo de riesgo. Guardar uno nuevo solo cuando el resultado cambia."""
-
+    """Resultado de riesgo y explicación asociada al análisis."""
     __tablename__ = "analisis_riesgo"
 
-<<<<<<< HEAD
-=======
-
+    id: Mapped[int] = mapped_column(primary_key=True)
+    proveedor_id: Mapped[int] = mapped_column(ForeignKey("proveedor.id", ondelete="CASCADE"))
+    puntaje: Mapped[int | None] = mapped_column(SmallInteger)
+    nivel: Mapped[NivelRiesgo] = mapped_column(pg_enum(NivelRiesgo, "nivel_riesgo"))
+    calculado_en: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     explicacion_resumen: Mapped[str | None] = mapped_column(Text)
     explicacion_acciones: Mapped[dict | list | None] = mapped_column(JSON)
     explicacion_origen: Mapped[str | None] = mapped_column(String(20))
     explicacion_modelo: Mapped[str | None] = mapped_column(String(100))
     explicacion_generada_en: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-
->>>>>>> origin/main
-    id: Mapped[int] = mapped_column(primary_key=True)
-    proveedor_id: Mapped[int] = mapped_column(ForeignKey("proveedor.id", ondelete="CASCADE"))
-    puntaje: Mapped[int | None] = mapped_column(SmallInteger)  # nulo si no hay datos suficientes
-    nivel: Mapped[NivelRiesgo] = mapped_column(pg_enum(NivelRiesgo, "nivel_riesgo"))
-    calculado_en: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     factores: Mapped[list["AnalisisRiesgoFactor"]] = relationship(
         cascade="all, delete-orphan", passive_deletes=True
@@ -57,8 +45,7 @@ class AnalisisRiesgo(Base):
 
 
 class AnalisisRiesgoFactor(Base):
-    """Cuánto aportó cada factor a un análisis: de aquí sale la explicación del riesgo."""
-
+    """Aporte de cada factor al análisis de riesgo."""
     __tablename__ = "analisis_riesgo_factor"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -71,8 +58,7 @@ class AnalisisRiesgoFactor(Base):
 
 
 class ParametroRiesgo(Base):
-    """Puntos máximos de cada factor. Los umbrales bajo/medio/alto están en core/constantes.py."""
-
+    """Puntos máximos de los factores de riesgo."""
     __tablename__ = "parametro_riesgo"
 
     id: Mapped[int] = mapped_column(primary_key=True)
