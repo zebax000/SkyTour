@@ -15,7 +15,6 @@ from app.services.vigencia import estado_documento, hoy
 
 TipoDocumento = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=100)]
 
-<<<<<<< HEAD
 CAMPOS_OPCIONALES_MAX = {
     "entidad_emisora": 200,
     "numero_documento": 100,
@@ -34,10 +33,6 @@ def _normalizar_opcional(valor: str | None, max_largo: int) -> str | None:
     return limpio or None
 
 
-=======
-
-# ---------- Entrada ----------
->>>>>>> origin/main
 class ArchivoIn(BaseModel):
     nombre: str = Field(min_length=1, max_length=255)
     contenido_base64: str = Field(min_length=1)
@@ -47,7 +42,6 @@ class DocumentoIn(BaseModel):
     tipo: TipoDocumento
     fecha_emision: date
     fecha_vencimiento: date
-<<<<<<< HEAD
     entidad_emisora: str | None = None
     numero_documento: str | None = None
     titular: str | None = None
@@ -72,17 +66,6 @@ class DocumentoIn(BaseModel):
         if valor is None:
             return None
         return _normalizar_opcional(str(valor), CAMPOS_OPCIONALES_MAX[info.field_name])
-=======
-    archivo: ArchivoIn
-
-    entidad_emisora: str | None = Field(None, max_length=200)
-    numero_documento: str | None = Field(None, max_length=100)
-    titular: str | None = Field(None, max_length=200)
-    identificacion_titular: str | None = Field(None, max_length=50)
-    lugar: str | None = Field(None, max_length=120)
-    objeto: str | None = Field(None, max_length=300)
-    resumen: str | None = Field(None, max_length=500)
->>>>>>> origin/main
 
     @model_validator(mode="after")
     def _fechas_coherentes(self):
@@ -92,7 +75,6 @@ class DocumentoIn(BaseModel):
 
 
 class DocumentoCambios(BaseModel):
-<<<<<<< HEAD
     tipo: TipoDocumento | None = None
     fecha_emision: date | None = None
     fecha_vencimiento: date | None = None
@@ -105,23 +87,6 @@ class DocumentoCambios(BaseModel):
     resumen: str | None = None
     archivo: ArchivoIn | None = None
 
-=======
-    """Solo se cambia lo que se envía. Si llega un archivo, reemplaza al anterior."""
-
-    tipo: TipoDocumento | None = None
-    fecha_emision: date | None = None
-    fecha_vencimiento: date | None = None
-    archivo: ArchivoIn | None = None
-
-    entidad_emisora: str | None = Field(None, max_length=200)
-    numero_documento: str | None = Field(None, max_length=100)
-    titular: str | None = Field(None, max_length=200)
-    identificacion_titular: str | None = Field(None, max_length=50)
-    lugar: str | None = Field(None, max_length=120)
-    objeto: str | None = Field(None, max_length=300)
-    resumen: str | None = Field(None, max_length=500)
-
->>>>>>> origin/main
     @field_validator("tipo", "fecha_emision", "fecha_vencimiento")
     @classmethod
     def _no_nulo(cls, valor):
@@ -129,7 +94,6 @@ class DocumentoCambios(BaseModel):
             raise ValueError("Este campo no puede quedar vacío.")
         return valor
 
-<<<<<<< HEAD
     @field_validator(
         "entidad_emisora",
         "numero_documento",
@@ -151,16 +115,6 @@ class ExtraccionIn(BaseModel):
     archivo: ArchivoIn
 
 
-=======
-
-class ExtraccionIn(BaseModel):
-    """Archivo cuyo tipo y fechas se quieren leer con IA. No se guarda."""
-
-    archivo: ArchivoIn
-
-
-# ---------- Salida ----------
->>>>>>> origin/main
 class ArchivoOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -177,10 +131,6 @@ class DocumentoOut(BaseModel):
     tipo: str
     fecha_emision: date
     fecha_vencimiento: date
-<<<<<<< HEAD
-=======
-    
->>>>>>> origin/main
     entidad_emisora: str | None = None
     numero_documento: str | None = None
     titular: str | None = None
@@ -188,10 +138,6 @@ class DocumentoOut(BaseModel):
     lugar: str | None = None
     objeto: str | None = None
     resumen: str | None = None
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/main
     creado_en: datetime
     archivo: ArchivoOut | None
 
@@ -224,20 +170,10 @@ class ResumenDocumentos(BaseModel):
 
 
 class ExtraccionOut(BaseModel):
-<<<<<<< HEAD
     origen: str
     tipo: str | None = None
     fecha_emision: date | None = None
     fecha_vencimiento: date | None = None
-=======
-    """Valores propuestos por la IA. Siempre los revisa una persona antes de guardar."""
-
-    origen: str  # "gemini" o "ninguno"
-    tipo: str | None = None
-    fecha_emision: date | None = None
-    fecha_vencimiento: date | None = None
-    
->>>>>>> origin/main
     entidad_emisora: str | None = None
     numero_documento: str | None = None
     titular: str | None = None
@@ -245,10 +181,6 @@ class ExtraccionOut(BaseModel):
     lugar: str | None = None
     objeto: str | None = None
     resumen: str | None = None
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/main
     modelo: str | None = None
     modelo_solicitado: str | None = None
     motivo: str | None = None
