@@ -22,7 +22,6 @@ def _revisar_contrasena(valor: str) -> str:
 
 class UsuarioAdminOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-
     id: int
     nombre: str
     correo: str
@@ -61,8 +60,7 @@ class UsuarioCrear(BaseModel):
 
 
 class UsuarioActualizar(BaseModel):
-    """Solo cambia lo que se envía. Un valor nulo explícito no se acepta."""
-
+    """Solo cambia lo enviado. Un valor nulo explícito no se acepta."""
     nombre: str | None = Field(default=None, max_length=120)
     rol: Rol | None = None
     activo: bool | None = None
@@ -97,7 +95,6 @@ class CambioContrasena(BaseModel):
     @classmethod
     def _nueva(cls, v: str) -> str:
         return _revisar_contrasena(v)
-<<<<<<< HEAD
 
 
 class SolicitudRestablecimiento(BaseModel):
@@ -125,5 +122,3 @@ class RestablecimientoIn(BaseModel):
     @classmethod
     def _nueva(cls, v: str) -> str:
         return _revisar_contrasena(v)
-=======
->>>>>>> origin/main

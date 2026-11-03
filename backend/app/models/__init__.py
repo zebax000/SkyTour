@@ -11,37 +11,14 @@ from app.models.enums import (
     TipoProveedor,
 )
 from app.models.proveedor import Proveedor, Servicio, Tarifa, ZonaCobertura
-<<<<<<< HEAD
 from app.models.restablecimiento import RestablecimientoContrasena
-=======
->>>>>>> origin/main
 from app.models.riesgo import AnalisisRiesgo, AnalisisRiesgoFactor, ParametroRiesgo
 from app.models.usuario import Usuario
 
 __all__ = [
-    "AnalisisRiesgo",
-    "AnalisisRiesgoFactor",
-    "Documento",
-    "DocumentoArchivo",
-    "EstadoProveedor",
-    "Evaluacion",
-    "FactorRiesgo",
-    "Gravedad",
-    "Incidente",
-    "Moneda",
-    "NivelRiesgo",
-    "Observacion",
-    "ParametroRiesgo",
-    "Proveedor",
-<<<<<<< HEAD
-    "RestablecimientoContrasena",
-=======
->>>>>>> origin/main
-    "Rol",
-    "Servicio",
-    "Tarifa",
-    "TipoIncidente",
-    "TipoProveedor",
-    "Usuario",
-    "ZonaCobertura",
+    "AnalisisRiesgo", "AnalisisRiesgoFactor", "Documento", "DocumentoArchivo",
+    "EstadoProveedor", "Evaluacion", "FactorRiesgo", "Gravedad", "Incidente",
+    "Moneda", "NivelRiesgo", "Observacion", "ParametroRiesgo", "Proveedor",
+    "RestablecimientoContrasena", "Rol", "Servicio", "Tarifa", "TipoIncidente",
+    "TipoProveedor", "Usuario", "ZonaCobertura",
 ]
