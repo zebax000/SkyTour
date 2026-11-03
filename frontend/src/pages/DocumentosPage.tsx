@@ -124,20 +124,12 @@ export function DocumentosPage() {
 
       <div className="barra-filtros" role="search">
         <label className="campo ancho">
-<<<<<<< HEAD
-          Buscar por proveedor, tipo, entidad o número
-=======
           Buscar por proveedor, tipo, entidad, número o titular
->>>>>>> origin/main
           <input
             type="search"
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
-<<<<<<< HEAD
             placeholder="Ej. Aurora, RNT o Ministerio"
-=======
-            placeholder="Ej. Aurora o Cámara de Comercio"
->>>>>>> origin/main
           />
         </label>
         <label className="campo">
@@ -185,7 +177,6 @@ export function DocumentosPage() {
             </tr>
           </thead>
           <tbody>
-<<<<<<< HEAD
             {datos?.items.map((d) => {
               const detalle = [
                 d.entidad_emisora,
@@ -217,39 +208,6 @@ export function DocumentosPage() {
                 </tr>
               );
             })}
-=======
-            {datos?.items.map((d) => (
-              <tr key={d.id}>
-                <td>
-                  <Link to={`/proveedores/${d.proveedor_id}`}>{d.proveedor_nombre}</Link>
-                </td>
-                <td>
-                  <strong>{d.tipo}</strong>
-                  {/* AQUÍ SE MUESTRAN LOS CAMPOS NUEVOS DE LA IA */}
-                  {(d.entidad_emisora || d.numero_documento) && (
-                    <div style={{ fontSize: '0.85em', color: '#555', marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                      {d.entidad_emisora && <span>🏢 Entidad: {d.entidad_emisora}</span>}
-                      {d.numero_documento && <span>#️⃣ Número: {d.numero_documento}</span>}
-                    </div>
-                  )}
-                </td>
-                <td>{formatearFecha(d.fecha_vencimiento)}</td>
-                <td>
-                  <InsigniaDocumento estado={d.estado} />
-                  <span className="detalle-vencimiento">{describirVencimiento(d.dias_restantes)}</span>
-                </td>
-                <td>
-                  {d.archivo ? (
-                    <button type="button" className="boton secundario pequeno" onClick={() => descargar(d)}>
-                      Descargar
-                    </button>
-                  ) : (
-                    "Sin archivo"
-                  )}
-                </td>
-              </tr>
-            ))}
->>>>>>> origin/main
           </tbody>
         </table>
         {cargando && !datos && <p className="vacio">Cargando documentos…</p>}
@@ -283,8 +241,4 @@ export function DocumentosPage() {
       </div>
     </section>
   );
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> origin/main
