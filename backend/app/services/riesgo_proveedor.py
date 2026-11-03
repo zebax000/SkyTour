@@ -1,3 +1,4 @@
+from datetime import UTC, datetime
 from zoneinfo import ZoneInfo
 
 from sqlalchemy import select
@@ -74,4 +75,30 @@ def guardar_resultado(db, proveedor_id, resultado):
     )
     db.add(analisis)
     db.flush()
+    return analisis
+
+
+def explicacion_guardada(analisis):
+    """Explicación persistida del análisis, con el mismo formato que la recién generada; None si no existe."""
+    if analisis is None or not analisis.explicacion_resumen:
+        return None
+    return {
+        'resumen': analisis.explicacion_resumen,
+        'acciones': list(analisis.explicacion_acciones or []),
+        'origen': analisis.explicacion_origen or 'gemini',
+        'modelo': analisis.explicacion_modelo,
+    }
+
+
+def guardar_explicacion(db, analisis_id, explicacion):
+    """Guarda la explicación generada por IA en el análisis exacto para el que se pidió."""
+    analisis = db.get(AnalisisRiesgo, analisis_id)
+    if analisis is None:
+        return None
+    analisis.explicacion_resumen = explicacion['resumen']
+    analisis.explicacion_acciones = list(explicacion.get('acciones') or [])
+    analisis.explicacion_origen = explicacion.get('origen')
+    analisis.explicacion_modelo = explicacion.get('modelo')
+    analisis.explicacion_generada_en = datetime.now(UTC)
+    db.commit()
     return analisis
