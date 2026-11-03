@@ -1,0 +1,33 @@
+/* Gestión de servicios, tarifas y zonas desde la ficha */
+.barra-seccion {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.servicio-cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.servicio-cabecera h2 {
+  margin: 0;
+}
+
+.acciones-servicio {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.servicio .grupo-servicio {
+  margin: 8px 0 12px;
+}
+
+.tabla .celda-accion {
+  text-align: right;
+}

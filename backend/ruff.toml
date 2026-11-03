@@ -1,0 +1,19 @@
+# Reglas de ruff para el backend. Se ejecuta con: python -m ruff check .
+# Este archivo fija las reglas para que el resultado sea igual en cualquier equipo.
+
+[lint]
+select = ["E4", "E7", "E9", "F", "I", "B", "C4", "RUF", "BLE"]
+ignore = [
+    "B008",   # Depends(), Query() y similares en los parámetros son el patrón oficial de FastAPI
+    "RUF012", # Pydantic copia los valores por defecto en cada instancia: no hay lista compartida
+]
+
+[lint.isort]
+known-first-party = ["app"]
+
+[lint.per-file-ignores]
+"app/seed.py" = ["C408"]  # datos de demostración escritos con dict(...)
+"tests/*" = ["C408"]
+"app/models/proveedor.py" = ["F821"]  # SQLAlchemy resuelve las relaciones escritas como texto ("Documento")
+"app/services/explicacion_riesgo.py" = ["BLE001"]  # una falla de Gemini nunca debe romper la aplicación
+"app/services/extraccion_documento.py" = ["BLE001"]  # igual: si la IA falla se informa el motivo y se sigue

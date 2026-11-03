@@ -1,0 +1,61 @@
+.riesgo-resumen {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.riesgo-puntaje {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.insignia.riesgo-bajo {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.insignia.riesgo-medio {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.insignia.riesgo-alto {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.insignia.riesgo-sin_datos {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.riesgo-factores {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.riesgo-factores li {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 0.25rem;
+}
+
+.riesgo-explicacion {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.riesgo-acciones {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}

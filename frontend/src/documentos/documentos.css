@@ -1,0 +1,137 @@
+/* Documentos y vigencias: semáforo, tabla, tarjetas de resumen y avisos */
+.doc-vigente {
+  color: #1d6b3d;
+  background: #e1f4e8;
+}
+
+.doc-por_vencer {
+  color: #7a5200;
+  background: #fdf0cc;
+}
+
+.doc-vencido {
+  color: #8a2525;
+  background: #fbe4e4;
+}
+
+.detalle-vencimiento {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.8rem;
+  color: #52606d;
+}
+
+.doc-titulo {
+  display: block;
+  font-weight: 600;
+  color: var(--texto);
+}
+
+.doc-secundario {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.82rem;
+  color: #52606d;
+}
+
+.doc-resumen-texto {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.8rem;
+  color: #3e4c59;
+  font-style: italic;
+}
+
+/* Tabla de documentos: las columnas cortas se ajustan a su contenido y el resto se reparte el espacio */
+.tabla-documentos th,
+.tabla-documentos td {
+  vertical-align: middle;
+}
+
+.tabla-documentos .col-fecha,
+.tabla-documentos .col-estado,
+.tabla-documentos .col-acciones {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.celda-archivo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-width: 150px;
+  max-width: 260px;
+}
+
+.archivo-nombre {
+  max-width: 100%;
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.archivo-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.archivo-tamano {
+  font-size: 0.8rem;
+  color: #52606d;
+}
+
+.sin-archivo {
+  font-style: italic;
+  color: #7b8794;
+}
+
+.aviso {
+  margin: 12px 0;
+  padding: 10px 12px;
+  color: #5c3d00;
+  background: #fdf0cc;
+  border-left: 4px solid var(--ambar);
+  border-radius: 4px;
+}
+
+.aviso.peligro {
+  color: #7a1f1f;
+  background: #fbeaea;
+  border-left-color: var(--rojo);
+}
+
+.tarjetas-resumen {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin: 12px 0 16px;
+}
+
+.tarjeta-resumen {
+  padding: 14px 16px;
+  text-align: left;
+  cursor: pointer;
+  background: #fff;
+  border: 2px solid var(--borde);
+  border-radius: 12px;
+}
+
+.tarjeta-resumen[aria-pressed="true"] {
+  border-color: var(--dorado);
+}
+
+.tarjeta-resumen .cifra {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--azul);
+}
+
+.acciones-fila {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+}
