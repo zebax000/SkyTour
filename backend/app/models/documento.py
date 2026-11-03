@@ -24,10 +24,8 @@ class Documento(Base):
     proveedor_id: Mapped[int] = mapped_column(ForeignKey("proveedor.id", ondelete="CASCADE"))
     tipo: Mapped[str] = mapped_column(String(100))
     fecha_emision: Mapped[date] = mapped_column(Date)
-    # El estado (vigente, por vencer, vencido) se calcula con esta fecha; no se guarda
+    # El estado se calcula con la fecha de vencimiento; no se guarda.
     fecha_vencimiento: Mapped[date] = mapped_column(Date)
-<<<<<<< HEAD
-=======
     entidad_emisora: Mapped[str | None] = mapped_column(String(200))
     numero_documento: Mapped[str | None] = mapped_column(String(100))
     titular: Mapped[str | None] = mapped_column(String(200))
@@ -35,8 +33,7 @@ class Documento(Base):
     lugar: Mapped[str | None] = mapped_column(String(120))
     objeto: Mapped[str | None] = mapped_column(String(300))
     resumen: Mapped[str | None] = mapped_column(String(500))
->>>>>>> origin/main
-    archivo_url: Mapped[str | None] = mapped_column(String(500))  # sin uso: los archivos van en documento_archivo
+    archivo_url: Mapped[str | None] = mapped_column(String(500))  # Los archivos van en documento_archivo.
     creado_en: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     archivo: Mapped[Optional["DocumentoArchivo"]] = relationship(
@@ -51,15 +48,14 @@ class Documento(Base):
 
 
 class DocumentoArchivo(Base):
-    """El archivo subido (PDF, JPG o PNG de hasta 5 MB), guardado en la base de datos."""
-
+    """Archivo PDF, JPG o PNG guardado en la base de datos."""
     __tablename__ = "documento_archivo"
 
     documento_id: Mapped[int] = mapped_column(ForeignKey("documento.id", ondelete="CASCADE"), primary_key=True)
     nombre: Mapped[str] = mapped_column(String(255))
     tipo_mime: Mapped[str] = mapped_column(String(100))
     tamano: Mapped[int] = mapped_column(Integer)
-    # deferred: solo se leen los bytes al descargar, no al listar
+    # Solo se leen los bytes al descargar, no al listar.
     datos: Mapped[bytes] = mapped_column(LargeBinary, deferred=True)
 
     __table_args__ = (CheckConstraint("tamano > 0", name="documento_archivo_tamano_positivo"),)

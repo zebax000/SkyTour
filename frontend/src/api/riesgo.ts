@@ -26,19 +26,12 @@ export type RespuestaExplicacion = ResultadoRiesgo & Explicacion;
 
 export const riesgoApi = {
   consultar: (proveedorId: number) => apiFetch<ResultadoRiesgo>(`/proveedores/${proveedorId}/riesgo`),
-<<<<<<< HEAD
   recalcular: (proveedorId: number) =>
     apiFetch<ResultadoRiesgo>(`/proveedores/${proveedorId}/riesgo/recalcular`, { method: "POST" }),
+  // Regenerar: fuerza una nueva explicación y devuelve también el cálculo.
   explicar: (proveedorId: number) =>
     apiFetch<RespuestaExplicacion>(`/proveedores/${proveedorId}/riesgo/explicacion`, { method: "POST" }),
-=======
-    
-  recalcular: (proveedorId: number) =>apiFetch<ResultadoRiesgo>(`/proveedores/${proveedorId}/riesgo/recalcular`, { method: "POST" }),
-    
-  // La ruta POST existente pasa a ser para forzar una nueva generación (Regenerar)
-  explicar: (proveedorId: number) =>apiFetch<RespuestaExplicacion>(`/proveedores/${proveedorId}/riesgo/explicacion`, { method: "POST" }),
-    
-  // NUEVO: La ruta GET para pedir la explicación automáticamente al entrar a la pestaña
-  obtenerExplicacion: (proveedorId: number) =>apiFetch<Explicacion>(`/proveedores/${proveedorId}/riesgo/explicacion`),
->>>>>>> origin/main
+  // Al entrar a la pestaña: devuelve la explicación guardada o la genera una vez.
+  obtenerExplicacion: (proveedorId: number) =>
+    apiFetch<Explicacion>(`/proveedores/${proveedorId}/riesgo/explicacion`),
 };

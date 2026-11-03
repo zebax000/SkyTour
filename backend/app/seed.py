@@ -48,7 +48,6 @@ PUNTOS_MAXIMOS = {
 T, E, G = TipoProveedor, EstadoProveedor, Gravedad
 INC, INCUM = TipoIncidente.incidente, TipoIncidente.incumplimiento
 
-<<<<<<< HEAD
 ENTIDADES_POR_TIPO = {
     "Registro Nacional de Turismo (RNT)": "Ministerio de Comercio, Industria y Turismo",
     "Póliza de responsabilidad civil": "Seguros SURA Colombia",
@@ -61,12 +60,6 @@ ENTIDADES_POR_TIPO = {
     "Revisión técnico-mecánica": "CDA Automotor del Caribe",
 }
 
-=======
-# Fechas como días respecto a hoy: negativo = pasado, positivo = futuro.
-# servicios: (nombre, descripción, [(valor, moneda, desde, hasta)])
-# docs: (tipo, emisión, vencimiento) | evals: (calidad, puntualidad, cumplimiento, precio, hace_dias)
-# incidentes: (tipo, gravedad, descripción, hace_dias, resuelto)
->>>>>>> origin/main
 PROVEEDORES = [
     dict(
         nombre="Hotel Aurora Boutique", nit="901000001-1", tipo=T.hotel, ciudad="Cartagena",
@@ -198,11 +191,7 @@ def _proveedores(db: Session) -> None:
         return
     evaluador = db.scalar(select(Usuario).where(Usuario.rol == Rol.evaluador))
     admin = db.scalar(select(Usuario).where(Usuario.rol == Rol.administrador))
-<<<<<<< HEAD
     for idx_p, d in enumerate(PROVEEDORES, start=1):
-=======
-    for d in PROVEEDORES:
->>>>>>> origin/main
         nombre_c, correo_c, tel_c = d["contacto"]
         db.add(
             Proveedor(
@@ -220,7 +209,6 @@ def _proveedores(db: Session) -> None:
                 ],
                 zonas=[ZonaCobertura(ciudad_o_region=z) for z in d["zonas"]],
                 documentos=[
-<<<<<<< HEAD
                     Documento(
                         tipo=t,
                         fecha_emision=_fecha(emi),
@@ -234,10 +222,6 @@ def _proveedores(db: Session) -> None:
                         resumen=f"{t} expedido a favor de {d['nombre']} en {d['ciudad']}. Acredita cumplimiento normativo para servicios turísticos.",
                     )
                     for idx_d, (t, emi, ven) in enumerate(d["docs"], start=1)
-=======
-                    Documento(tipo=t, fecha_emision=_fecha(emi), fecha_vencimiento=_fecha(ven))
-                    for t, emi, ven in d["docs"]
->>>>>>> origin/main
                 ],
                 evaluaciones=[
                     Evaluacion(
