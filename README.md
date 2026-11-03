@@ -8,21 +8,12 @@ Estado: el MVP funciona completo en local. La publicación en línea está expli
 
 - Registro y clasificación de proveedores por tipo
 - Servicios, tarifas y zonas de cobertura
-<<<<<<< HEAD
 - Documentos con semáforo de vigencias (vigente, por vencer, vencido) y lectura ampliada de archivos con IA (tipo, fechas, entidad emisora, número, titular, lugar, objeto y resumen)
 - Evaluaciones de 1 a 5, incidentes, incumplimientos y observaciones
 - Riesgo de 0 a 100 (bajo, medio, alto) con explicación automática con IA persistida por análisis
 - Lista de atención, comparador de 2 a 4 proveedores, ranking con descarga en CSV y PDF, y Dashboard
 - Tres roles: administrador, evaluador y consultor
 - Administración de usuarios para el administrador: altas, cambio de rol, desactivación y restablecimiento de contraseña. Cada persona cambia la suya desde Mi cuenta o la recupera por correo (`¿Olvidaste tu contraseña?`)
-=======
-- Documentos con semáforo de vigencias (vigente, por vencer, vencido) y lectura de archivos con IA
-- Evaluaciones de 1 a 5, incidentes, incumplimientos y observaciones
-- Riesgo de 0 a 100 (bajo, medio, alto) con explicación de factores
-- Lista de atención, comparador de 2 a 4 proveedores, ranking con descarga en CSV y PDF, y Dashboard
-- Tres roles: administrador, evaluador y consultor
-- Administración de usuarios para el administrador: altas, cambio de rol, desactivación y restablecimiento de contraseña. Cada persona cambia la suya desde Mi cuenta
->>>>>>> origin/main
 - Inicio de sesión protegido: cinco intentos fallidos bloquean el correo durante 15 minutos
 
 ## MVP
@@ -37,10 +28,7 @@ El trabajo se organiza en sprints. El Sprint 1 es el primer incremento y el MVP 
 | Backend | Python 3, FastAPI, SQLAlchemy y Pydantic |
 | Base de datos | PostgreSQL (Neon) |
 | IA | Gemini, con respaldo por reglas si no hay clave |
-<<<<<<< HEAD
 | Correo | Brevo (API HTTPS transaccional) para recuperación de contraseña |
-=======
->>>>>>> origin/main
 | Pruebas | pytest en el backend (las pruebas del frontend con Vitest están pendientes) |
 | Despliegue | Vercel (frontend) y Render (backend) |
 | Gestión | Git, GitHub, Jira y Figma |
@@ -60,11 +48,7 @@ Necesitas Python 3, Node.js y una base PostgreSQL en [Neon](https://neon.tech). 
 
 ### 1. Variables de entorno
 
-<<<<<<< HEAD
 Copia `.env.example` a `.env` en la raíz del repositorio y completa los valores. Como mínimo `DATABASE_URL` y `SECRET_KEY`. Si quieres probar el envío de correos de recuperación de contraseña, añade `BREVO_API_KEY` y `CORREO_REMITENTE` (verificados en Brevo). El archivo `.env` nunca se sube.
-=======
-Copia `.env.example` a `.env` en la raíz del repositorio y completa los valores. Como mínimo `DATABASE_URL` y `SECRET_KEY`. El archivo `.env` nunca se sube.
->>>>>>> origin/main
 
 ### 2. Backend
 
@@ -78,11 +62,7 @@ python -m app.seed
 uvicorn app.main:app --reload
 ```
 
-<<<<<<< HEAD
 - `alembic upgrade head` crea las tablas y aplica las migraciones (`0001` a `0005`).
-=======
-- `alembic upgrade head` crea las tablas.
->>>>>>> origin/main
 - `python -m app.seed` carga datos ficticios y tres usuarios de demostración (uno por rol) con la contraseña de `SEED_PASSWORD`. Los correos están en `backend/app/seed.py`. No lo ejecutes contra una base con datos reales.
 - Para crear tu propio administrador en una base vacía: `python -m app.crear_admin --nombre "Tu Nombre" --correo tu@correo.com`. Pide la contraseña por teclado.
 - La API queda en http://localhost:8000. Comprueba que responde en http://localhost:8000/health.
@@ -105,11 +85,7 @@ La aplicación abre en http://localhost:5173 y por defecto habla con http://loca
 
 ## Despliegue
 
-<<<<<<< HEAD
 El backend va en Render y el frontend en Vercel, sobre la base de Neon. Los pasos, las variables (incluyendo la configuración de Brevo) y las comprobaciones están en [docs/Despliegue.md](docs/Despliegue.md).
-=======
-El backend va en Render y el frontend en Vercel, sobre la base de Neon. Los pasos, las variables y las comprobaciones están en [docs/Despliegue.md](docs/Despliegue.md).
->>>>>>> origin/main
 
 ## Documentación
 
