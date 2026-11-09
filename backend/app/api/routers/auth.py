@@ -2,7 +2,7 @@ import math
 from collections.abc import Callable
 from datetime import UTC, datetime
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Response, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, Response, status
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
@@ -133,9 +133,11 @@ def olvide_contrasena(
 @router.post("/restablecer-contrasena", status_code=status.HTTP_204_NO_CONTENT)
 def restablecer_contrasena_con_token(
     datos: RestablecimientoIn,
+    request: Request,
     db: Session = Depends(get_db),
 ) -> Response:
-    clave_limite = "restablecer:intentos"
+    origen = request.client.host if request.client else "desconocido"
+    clave_limite = f"restablecer:origen:{hash_token(origen)}"
     espera = limitador_login.segundos_bloqueado(clave_limite)
     if espera > 0:
         raise _bloqueado(espera)
@@ -156,4 +158,5 @@ def restablecer_contrasena_con_token(
     db.commit()
     limitador_login.reiniciar(usuario.correo)
     limitador_login.reiniciar(f"olvide:{usuario.correo}")
+    limitador_login.reiniciar(clave_limite)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
