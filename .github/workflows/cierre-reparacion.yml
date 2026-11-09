@@ -1,0 +1,210 @@
+name: Reparar y validar cierre
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/cierre-reparacion.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: cierre-reparacion
+  cancel-in-progress: false
+jobs:
+  reparar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DATABASE_URL: postgresql://usuario:clave@localhost/pruebas
+      SECRET_KEY: clave-exclusiva-de-ci-no-usar-en-produccion-123456789
+      FRONTEND_URL: http://localhost:5173
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Aplicar correcciones controladas
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+
+          ruta = Path('backend/app/api/routers/auth.py')
+          texto = ruta.read_text()
+          anterior = '    clave_limite = "restablecer:intentos"'
+          if anterior in texto:
+              importacion = 'HTTPException, Response, status'
+              firma = 'def restablecer_contrasena_con_token(\n    datos: RestablecimientoIn,'
+              cierre = '    limitador_login.reiniciar(f"olvide:{usuario.correo}")'
+              for fragmento in (anterior, importacion, firma, cierre):
+                  if texto.count(fragmento) != 1:
+                      raise RuntimeError('El router cambio; se requiere revision antes de editarlo')
+              texto = texto.replace(importacion, 'HTTPException, Request, Response, status', 1)
+              texto = texto.replace(firma, firma + '\n    request: Request,', 1)
+              texto = texto.replace(anterior, '    origen = request.client.host if request.client else "desconocido"\n    clave_limite = f"restablecer:origen:{hash_token(origen)}"', 1)
+              texto = texto.replace(cierre, cierre + '\n    limitador_login.reiniciar(clave_limite)', 1)
+              ruta.write_text(texto)
+          elif 'restablecer:origen:{hash_token(origen)}' not in texto:
+              raise RuntimeError('El router no coincide con la version revisada')
+
+          lock = Path('frontend/package-lock.json')
+          lineas = []
+          estado = 'normal'
+          for linea in lock.read_text().splitlines(keepends=True):
+              if linea.startswith('<<<<<<< '):
+                  if estado != 'normal':
+                      raise RuntimeError('Conflicto anidado no esperado')
+                  estado = 'local'
+              elif linea.rstrip() == '=======' and estado == 'local':
+                  estado = 'remoto'
+              elif linea.startswith('>>>>>>> ') and estado == 'remoto':
+                  estado = 'normal'
+              elif estado != 'remoto':
+                  lineas.append(linea)
+          if estado != 'normal':
+              raise RuntimeError('Conflicto incompleto')
+          limpio = ''.join(lineas)
+          json.loads(limpio)
+          lock.write_text(limpio)
+
+          Path('backend/tests/test_restablecimiento_aislamiento.py').write_text('''from datetime import UTC, datetime, timedelta
+          from types import SimpleNamespace
+
+          import pytest
+          from fastapi import HTTPException
+          from starlette.requests import Request
+
+          from app.api.routers import auth
+          from app.schemas.usuario import RestablecimientoIn
+          from app.services.limitador import limitador_login
+
+
+          class BaseFalsa:
+              def __init__(self, registro=None, usuario=None):
+                  self.registro = registro
+                  self.usuario = usuario
+                  self.consultas = 0
+                  self.commits = 0
+
+              def scalar(self, consulta):
+                  self.consultas += 1
+                  return self.registro
+
+              def get(self, modelo, identificador):
+                  return self.usuario
+
+              def commit(self):
+                  self.commits += 1
+
+
+          @pytest.fixture(autouse=True)
+          def limpiar_limitador():
+              limitador_login.vaciar()
+              yield
+              limitador_login.vaciar()
+
+
+          def peticion(ip, cabeceras=()):
+              return Request({
+                  "type": "http", "method": "POST", "path": "/auth/restablecer-contrasena",
+                  "headers": list(cabeceras), "client": (ip, 1234),
+              })
+
+
+          def datos():
+              return RestablecimientoIn(token="a" * 43, contrasena_nueva="NuevaClave123")
+
+
+          def fallar(request, db):
+              with pytest.raises(HTTPException) as error:
+                  auth.restablecer_contrasena_con_token(datos=datos(), request=request, db=db)
+              return error.value
+
+
+          def test_cinco_fallos_no_bloquean_otro_origen(monkeypatch):
+              db_invalida = BaseFalsa()
+              for _ in range(5):
+                  assert fallar(peticion("192.0.2.1"), db_invalida).status_code == 400
+              bloqueo = fallar(peticion("192.0.2.1"), db_invalida)
+              assert bloqueo.status_code == 429
+              assert int(bloqueo.headers["Retry-After"]) > 0
+              assert db_invalida.consultas == 5
+              usuario = SimpleNamespace(id=1, activo=True, correo="ana@example.com", contrasena_hash="anterior")
+              registro = SimpleNamespace(usuario_id=1, usado_en=None, vence_en=datetime.now(UTC) + timedelta(minutes=30))
+              db_valida = BaseFalsa(registro, usuario)
+              monkeypatch.setattr(auth, "hash_password", lambda clave: "hash-nuevo")
+              respuesta = auth.restablecer_contrasena_con_token(datos=datos(), request=peticion("192.0.2.2"), db=db_valida)
+              assert respuesta.status_code == 204
+              assert db_valida.commits == 1
+              assert usuario.contrasena_hash == "hash-nuevo"
+              assert registro.usado_en is not None
+
+
+          def test_cabecera_falsa_no_evade_limite():
+              db = BaseFalsa()
+              for n in range(5):
+                  request = peticion("192.0.2.1", [(b"x-forwarded-for", f"198.51.100.{n}".encode())])
+                  assert fallar(request, db).status_code == 400
+              request = peticion("192.0.2.1", [(b"x-forwarded-for", b"203.0.113.99")])
+              assert fallar(request, db).status_code == 429
+
+
+          def test_exito_reinicia_contador_del_origen(monkeypatch):
+              request = peticion("192.0.2.3")
+              for _ in range(4):
+                  assert fallar(request, BaseFalsa()).status_code == 400
+              usuario = SimpleNamespace(id=1, activo=True, correo="ana@example.com", contrasena_hash="anterior")
+              registro = SimpleNamespace(usuario_id=1, usado_en=None, vence_en=datetime.now(UTC) + timedelta(minutes=30))
+              monkeypatch.setattr(auth, "hash_password", lambda clave: "hash-nuevo")
+              assert auth.restablecer_contrasena_con_token(datos=datos(), request=request, db=BaseFalsa(registro, usuario)).status_code == 204
+              for _ in range(5):
+                  assert fallar(request, BaseFalsa()).status_code == 400
+              assert fallar(request, BaseFalsa()).status_code == 429
+          ''')
+      - name: Regenerar archivo de dependencias con npm
+        working-directory: frontend
+        run: npm install --package-lock-only --ignore-scripts
+      - name: Instalar frontend desde el lock regenerado
+        working-directory: frontend
+        run: npm ci
+      - name: Lint frontend
+        working-directory: frontend
+        run: npm run lint
+      - name: Compilar frontend
+        working-directory: frontend
+        run: npm run build
+      - name: Instalar dependencias de pruebas
+        working-directory: backend
+        run: python -m pip install -r requirements-dev.txt
+      - name: Compilar Python
+        run: python -m compileall -q backend/app backend/alembic
+      - name: Ejecutar pruebas backend sin base real
+        working-directory: backend
+        run: python -m pytest -q
+      - name: Revisar estilo de las pruebas nuevas
+        working-directory: backend
+        run: ruff check tests/test_restablecimiento_aislamiento.py
+      - name: Buscar conflictos y errores de espacios
+        shell: bash
+        run: |
+          if git grep -n -E '^(<<<<<<< |>>>>>>> |\|\|\|\|\|\|\| )' -- . ':!.github/workflows/cierre-reparacion.yml'; then
+            echo 'Quedan marcadores de conflicto; no se publicara la reparacion.'
+            exit 1
+          fi
+          git diff --check
+      - name: Guardar solo las correcciones validadas
+        shell: bash
+        run: |
+          git add backend/app/api/routers/auth.py backend/tests/test_restablecimiento_aislamiento.py frontend/package-lock.json
+          if git diff --cached --quiet; then
+            echo 'Las correcciones ya estan publicadas.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'fix: isolate reset attempts and regenerate validated npm lockfile'
+          git push origin HEAD:main
